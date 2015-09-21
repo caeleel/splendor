@@ -1,0 +1,426 @@
+body {
+  font-style: italic;
+  font-weight: bold;
+  font-family: Georgia, cursive;
+  background: #EEE;
+  padding: 0;
+  margin: 0;
+}
+
+button {
+  font-style: italic;
+  font-weight: bold;
+  font-family: Georgia, cursive;
+  border: 2px solid black;
+  border-radius: 3px;
+  background-color: white;
+  margin-right: 10px;
+  padding: 5px 10px 5px 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.info-button {
+  margin-left: 10px;
+  margin-right: 0;
+  border: 1px solid black;
+  font-size: 12px;
+  padding: 1px 4px 1px 4px;
+}
+
+#status-window {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  border-right: 2px solid black;
+  height: 130px;
+  width: 52px;
+  text-align: center;
+  letter-spacing: 1px;
+  overflow: hidden;
+  background-color: white;
+}
+
+.status-box {
+  font-size: 13px;
+  height: 22px;
+  width: 36px;
+  border-bottom: 2px solid black;
+  padding: 7px 8px 2px 8px;
+}
+
+.status-label {
+  font-weight: bold;
+}
+
+#error-box {
+  display: none;
+}
+
+#info-box, #error-box {
+  left: 30%;
+  width: 40%;
+  position: fixed;
+  bottom: 0;
+  border-top: 2px solid black;
+  border-left: 2px solid black;
+  border-right: 2px solid black;
+  height: 30px;
+  background-color: white;
+}
+
+#error-box-inner {
+  background-color: #E61919;
+}
+
+#error-box-inner, #info-box-inner {
+  margin-left: 10px;
+  margin-right: 10px;
+  border-left: 2px solid black;
+  border-right: 2px solid black;
+  padding: 8px;
+  height: 14px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+#game-board {
+  width: 96%;
+  padding-left: 10px;
+  -webkit-text-fill-color: white;
+  -webkit-text-stroke-width: 0.5px;
+  -webkit-text-stroke-color: black;
+}
+
+#common-area {
+  height: 680px;
+  width: 764px;
+  float: left;
+}
+
+#noble-area {
+  height: 140px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+#level-area {
+  height: 540px;
+  width: 680px;
+  float: left;
+}
+
+#gem-area {
+  height: 540px;
+  width: 84px;
+  float: left;
+}
+
+#player-area {
+  height: 680px;
+  width: 500px;
+  float: right;
+}
+
+.noble {
+  float: left;
+  margin-right: 12px;
+  width: 130px;
+  height: 130px;
+  box-shadow: 8px 8px 10px #dedede;
+  border-radius: 8px;
+  background-color: #888;
+}
+
+.card, .deck {
+  float: left;
+  margin-right: 12px;
+  margin-bottom: 22px;
+  width: 120px;
+  height: 160px;
+  box-shadow: 8px 8px 10px #dedede;
+  border-radius: 7px;
+  position: relative;
+}
+
+.c_level1 .card {
+  background-color: #28B03D;
+}
+
+.c_level2 .card {
+  background-color: #FFB921;
+}
+
+.c_level3 .card {
+  background-color: #306CBA;
+}
+
+.color {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  background-size: 30px 30px;
+  background-repeat: no-repeat;
+}
+
+.side-bar {
+  width: 30px;
+  height: 128px;
+  padding-left: 3px;
+  padding-top: 2px;
+  background-color: snow;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.points {
+  padding-left: 4px;
+  font-size: 30px;
+  margin-bottom: 8px;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #777;
+}
+
+.header {
+  height: 44px;
+  width: 115px;
+  padding-left: 5px;
+  top: 0px;
+  position: absolute;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  background-color: snow;
+}
+
+.requires {
+  font-size: 14px;
+  width: 8px;
+  height: 20px;
+  padding: 1px 4px 1px 4px;
+  margin-left: 3px;
+  border-radius: 3px;
+  border: 1px solid white;
+  margin-bottom: 2px;
+}
+
+.remaining {
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
+  border-bottom-left-radius: 50%;
+  border-top-left-radius: 8px;
+  background-color: black;
+  border: 3px solid white;
+  width: 30px;
+  height: 26px;
+  padding-top: 4px;
+  text-align: center;
+}
+
+.costs {
+  text-align: center;
+  padding-left: 5px;
+  bottom:4px;
+  position: absolute;
+}
+
+.cost {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-bottom: 1px;
+}
+
+.b {
+  background-image: -moz-radial-gradient(20px 20px 45deg, circle cover, black 0%, dimgray 100%, slategray 95%);
+	background-image: -webkit-radial-gradient(20px 20px, circle cover, black, dimgray);
+	background-image: radial-gradient(20px 20px 45deg, circle cover, black 0%, dimgray 100%, slategray 95%);
+}
+
+.u {
+  background-image: -moz-radial-gradient(20px 20px 45deg, circle cover, blue 0%, dodgerblue 100%, deepskyblue 95%);
+	background-image: -webkit-radial-gradient(20px 20px, circle cover, blue, dodgerblue);
+	background-image: radial-gradient(20px 20px 45deg, circle cover, blue 0%, dodgerblue 100%, deepskyblue 95%);
+}
+
+.w {
+  background-image: -moz-radial-gradient(20px 20px 45deg, circle cover, lightgray 0%, white 100%, black 95%);
+	background-image: -webkit-radial-gradient(20px 20px, circle cover, lightgray, white);
+	background-image: radial-gradient(20px 20px 45deg, circle cover, lightgray 0%, white 100%, black 95%);
+}
+
+.g {
+  background-image: -moz-radial-gradient(20px 20px 45deg, circle cover, green 0%, yellowgreen 100%, seagreen 95%);
+	background-image: -webkit-radial-gradient(20px 20px, circle cover, green, yellowgreen);
+	background-image: radial-gradient(20px 20px 45deg, circle cover, green 0%, yellowgreen 100%, seagreen 95%);
+}
+
+.r {
+  background-image: -moz-radial-gradient(20px 20px 45deg, circle cover, darkred 0%, orangered 100%, firebrick 95%);
+  background-image: -webkit-radial-gradient(20px 20px, circle cover, darkred, orangered);
+  background-image: radial-gradient(20px 20px 45deg, circle cover, darkred 0%, orangered 100%, firebrick 95%);
+}
+
+.gem {
+  background-size: 80px 80px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 7px;
+  box-shadow: 4px 4px 4px #c2c2c2;
+}
+
+.player .gem {
+  background-size: 60px 60px;
+  width: 60px;
+  height: 60px;
+  margin-right: 5px;
+  float: left;
+}
+
+.player {
+  height: 170px;
+}
+
+.uchip {
+  background-image: url('img/ugem.png');
+}
+
+.bchip {
+  background-image: url('img/bgem.png');
+}
+
+.rchip {
+  background-image: url('img/rgem.png');
+}
+
+.gchip {
+  background-image: url('img/ggem.png');
+}
+
+.wchip {
+  background-image: url('img/wgem.png');
+}
+
+.schip {
+  background-image: url('img/sgem.png');
+}
+
+.bubble {
+  border-radius: 50%;
+  border: 3px solid white;
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  background-color: black;
+}
+
+.wgem {
+  top: 9px;
+  background-image: url('img/diamond.png');
+}
+
+.ggem {
+  background-image: url('img/emerald.png');
+}
+
+.rgem {
+  background-image: url('img/ruby.png');
+}
+
+.bgem {
+  background-image: url('img/chocolate.png');
+}
+
+.ugem {
+  background-image: url('img/sapphire.png');
+}
+
+.deck {
+  background-color: white;
+  background-size: 114px 154px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.level1 {
+  background-image: url('img/level1.png');
+}
+
+.level2 {
+  background-image: url('img/level2.png');
+}
+
+.level3 {
+  background-image: url('img/level3.png');
+}
+
+.breaker {
+  clear: both;
+}
+
+#game-title {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid black;
+  width: 100%;
+  font-weight: bold;
+  font-size: 24px;
+  height: 37px;
+}
+
+#game-title-span {
+  padding-left: 15px;
+}
+
+#leave-game, #start-game {
+  float: right;
+}
+
+#games-list {
+  float: left;
+  width: 70%;
+}
+
+#game-manager {
+  margin: 40px;
+}
+
+#games-list ul li span.game-title {
+  cursor: pointer;
+  font-weight: bold;
+  color: #750000;
+}
+
+#games-list ul li .game-playerCount{
+  font-weight: lighter;
+  color: #AAA;
+  font-size: .8em;
+}
+
+#create-game {
+  float: left;
+  width: 30%;
+}
+
+#create-game input[type=text] {
+    font-size: 1.2em;
+    padding: 0.25em;
+    margin: 0.25em 0;
+}
+
+#create-game input[type=submit] {
+  border-radius: 0.5em;
+  background: #750000;
+  border: none;
+  padding: 1em;
+  color: #fff;
+  margin-top: 1em;
+}
+
+.game-title {
+  padding-right: 5px;
+}
