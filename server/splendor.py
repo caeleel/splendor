@@ -62,7 +62,7 @@ class GameManager(object):
         self.changed[pid] = False
         self.has_changed()
 
-        return {'id': pid, 'uuid': uuid}
+        return {'title': self.title, 'id': pid, 'uuid': uuid}
 
     def start_game(self):
         if self.game.start_game():
@@ -110,6 +110,7 @@ def join_game(game):
         payload = request.get_json(force=True)
     if game not in game_map:
         return {'error': 'No such game'}
+    print payload
     return game_map[game].join_game(payload.get('name'))
 
 @app.route('/start/<game>/<starter>', methods=['POST'])

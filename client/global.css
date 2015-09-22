@@ -7,7 +7,7 @@ body {
   margin: 0;
 }
 
-button {
+button, .inputButton {
   font-style: italic;
   font-weight: bold;
   font-family: Georgia, cursive;
@@ -93,6 +93,42 @@ button {
   -webkit-text-stroke-color: black;
 }
 
+#pass-turn {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: 4px 15px 4px 15px;
+  cursor: pointer;
+  background-color: white;
+  border-right: 2px solid black;
+  border-top: 2px solid black;
+}
+
+.playerName, .turnIndicator{
+  -webkit-text-fill-color: black;
+  margin-bottom: 15px;
+  float: left;
+  font-size: 20px;
+}
+
+.turnIndicator {
+  width: 20px;
+  font-style: normal;
+}
+
+.playerPoints {
+  font-style: normal;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  background-color: black;
+  float: left;
+  font-size: 20px;
+  margin-left: 10px;
+  border-radius: 3px;
+  -webkit-text-stroke-width: 0;
+}
+
 #common-area {
   height: 680px;
   width: 764px;
@@ -128,9 +164,10 @@ button {
   margin-right: 12px;
   width: 130px;
   height: 130px;
+  border: 1px solid white;
   box-shadow: 8px 8px 10px #dedede;
   border-radius: 8px;
-  background-color: #888;
+  background-color: #eeeeee;
 }
 
 .card, .deck {
@@ -139,21 +176,189 @@ button {
   margin-bottom: 22px;
   width: 120px;
   height: 160px;
-  box-shadow: 8px 8px 10px #dedede;
   border-radius: 7px;
+  position: relative;
+  border: 1px solid white;
+  box-shadow: 4px 4px 4px #ccc;
+}
+
+.overlay {
+  display: none;
+  transition: opacity .25s ease-in-out;
+  -moz-transition: opacity .25s ease-in-out;
+  -webkit-transition: opacity .25s ease-in-out;
+}
+
+#common-area .card:hover .overlay, .deck:hover .overlay, .reserveArea .card:hover .overlay {
+  background-color: rgba(255, 255, 255, 0.4);
+  position: absolute;
+  border-radius: 6px;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: block;
+}
+
+.act:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.act {
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.buy {
+  font-size: 28px;
+  text-align: center;
+  margin-top: 65px;
+  margin-left: 44px;
+  width: 29px;
+  height: 29px;
+  border: 3px solid white;
   position: relative;
 }
 
-.c_level1 .card {
-  background-color: #28B03D;
+.plus {
+  position: absolute;
+  font-family: "Arial Black", Gadget, sans-serif;
+  font-style: normal;
+  -webkit-text-stroke-width: 0;
+  font-weight: normal;
+  top: -6px;
+  left: 5px;
 }
 
-.c_level2 .card {
-  background-color: #FFB921;
+.reserve {
+  position: absolute;
+  bottom: 20px;
+  left: 45px;
+  height: 33px;
+  width: 33px;
 }
 
-.c_level3 .card {
-  background-color: #306CBA;
+.reserveCards {
+  float: left;
+  width: 310px;
+  height: 125px;
+  border-radius: 5px;
+  padding: 10px;
+  padding-left: 20px;
+  border: 2px solid black;
+  -webkit-box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.2);
+  -moz-box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.2);
+  box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.2);
+}
+
+.reserveArea .reserve {
+  display: none;
+}
+
+.floppy {
+  width: 33px;
+  height: 33px;
+}
+
+.card .underlay {
+  z-index: 1;
+}
+
+.colorSet {
+  float: left;
+}
+
+.colorSet .card {
+  float: none;
+}
+
+.colorSetInner {
+  height:30px;
+  overflow: visible;
+}
+
+.spacer, .smallspacer {
+  width: 120px;
+  margin-right: 13px;
+  margin-bottom: 40px;
+}
+
+.spacer {
+  height: 120px;
+}
+
+.smallspacer {
+  height: 1px;
+}
+
+.floater {
+  width: 420px;
+  float: left;
+}
+
+.nobles {
+  float: left;
+}
+
+.player .noble {
+  float: none;
+  zoom: 0.5;
+  -moz-transform: scale(0.5);
+}
+
+.colorSetInner, .spacer, .smallspacer {
+  zoom: 0.5;
+  -moz-transform: scale(0.5);
+}
+
+.reserveText {
+  padding-left: 10px;
+  -ms-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+  width: 20px;
+  height: 20px;
+  -webkit-text-fill-color: black;
+  float: left;
+}
+
+.reserveArea {
+  margin-top: 20px;
+}
+
+.reserveArea .card, .reserveArea .deck {
+  zoom: 0.75;
+  -moz-transform: scale(0.75);
+}
+
+.card-r {
+  background-image: url('img/volcano.jpg');
+  background-size: 284px 160px;
+  background-position: center;
+}
+
+.card-g {
+  background-image: url('img/ship.jpg');
+  background-size: 284px 160px;
+  background-position: center;
+}
+
+.card-b {
+  background-image: url('img/desert.jpg');
+  background-size: 334px 160px;
+  background-position: center;
+}
+
+.card-w {
+  background-image: url('img/mountain.jpg');
+  background-size: 284px 160px;
+  background-position: center;
+}
+
+.card-u {
+  background-image: url('img/island.jpg');
+  background-size: 213px 160px;
+  background-position: center;
 }
 
 .color {
@@ -192,7 +397,12 @@ button {
   position: absolute;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
-  background-color: snow;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.player .header {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
 }
 
 .requires {
@@ -271,18 +481,40 @@ button {
   border-radius: 50%;
   margin-bottom: 7px;
   box-shadow: 4px 4px 4px #c2c2c2;
+  position: relative;
+}
+
+.you .gem:hover .underlay {
+  display: block;
+}
+
+.you .gem .underlay {
+  position: absolute;
+  width: 80px;
+  height: 76px;
+  padding-top: 4px;
+  text-align: center;
+  -webkit-text-stroke-color: white;
+  -webkit-text-stroke-width: 0;
+  font-family: "Arial Black", Gadget, sans-serif;
+  font-style: normal;
+  font-size: 50px;
+  cursor: pointer;
+}
+
+.gem .underlay {
+  display: none;
 }
 
 .player .gem {
-  background-size: 60px 60px;
-  width: 60px;
-  height: 60px;
-  margin-right: 5px;
+  zoom: 0.7;
+  -moz-transform: scale(0.7);
+  margin-right: 18px;
   float: left;
 }
 
 .player {
-  height: 170px;
+  margin-bottom: 30px;
 }
 
 .uchip {
@@ -309,6 +541,14 @@ button {
   background-image: url('img/sgem.png');
 }
 
+.player .bubble {
+  width: 30px;
+  height: 30px;
+  font-size: 22px;
+  top: -8px;
+  left: -8px;
+}
+
 .bubble {
   border-radius: 50%;
   border: 3px solid white;
@@ -316,6 +556,8 @@ button {
   height: 22px;
   text-align: center;
   background-color: black;
+  position: absolute;
+  z-index: 2;
 }
 
 .wgem {
@@ -407,17 +649,20 @@ button {
 }
 
 #create-game input[type=text] {
-    font-size: 1.2em;
-    padding: 0.25em;
-    margin: 0.25em 0;
+  font-size: 1.2em;
+  padding: 0.25em;
+  margin: 0.25em 0;
+  font-family: Georgia, serif;
+  font-style: italic;
+  border-radius: 3px;
 }
 
 #create-game input[type=submit] {
   border-radius: 0.5em;
-  background: #750000;
-  border: none;
+  background-color: white;
+  border: 2px solid black;
   padding: 1em;
-  color: #fff;
+  color: black;
   margin-top: 1em;
 }
 

@@ -91,8 +91,9 @@ class Player(object):
         self.game.gems['*'] += owed
         for c in COLORS:
             if card.cost[c] > len(self.cards[c]):
-                self.gems[c] -= card.cost[c] - len(self.cards[c])
-                self.game.gems[c] += card.cost[c] - len(self.cards[c])
+                pay = min(card.cost[c] - len(self.cards[c]), self.gems[c])
+                self.gems[c] -= pay
+                self.game.gems[c] += pay
         return {}
 
     def discard(self, color):
@@ -135,6 +136,8 @@ class Player(object):
             return {'error': "Cannot take more than 3 gems"}
         if len(self.taken) > 1 and color in self.taken:
             return {'error': "Cannot take the same color on the 3rd gem"}
+        if len(self.taken) == 1 and color in self.taken and self.game.gems[color] < 3:
+            return {'error': "Cannot take 2 gems from the same pile of less than 4"}
         if self.total_gems() > 9:
             return {'error': "Already have 10 gems"}
         self.game.gems[color] -= 1
@@ -210,6 +213,7 @@ DUMMY_PLAYER = DummyPlayer()
 class Card(object):
     def __init__(self, c, p, w=0, u=0, g=0, r=0, b=0):
         self.color = c
+        self.level = None
         self.points = p
         self.uuid = uuid.uuid4().hex
         self.cost = {
@@ -226,6 +230,7 @@ class Card(object):
             'points': self.points,
             'uuid': self.uuid,
             'cost': self.cost,
+            'level': self.level,
         }
 
 def find_uuid(uuid, cards):
@@ -359,8 +364,8 @@ class Game(object):
             Card('g', 5, 0, 7, 3, 0, 0),
             Card('r', 3, 3, 5, 3, 0, 3),
             Card('r', 4, 0, 0, 7, 0, 0),
-            Card('r', 4, 0, 3, 6, 3, 5),
-            Card('r', 5, 0, 0, 7, 3, 6),
+            Card('r', 4, 0, 3, 6, 3, 0),
+            Card('r', 5, 0, 0, 7, 3, 0),
         ]
         self.noble_pool = [
             Noble(3, 0, 0, 0, 4, 4),
@@ -383,22 +388,20 @@ class Game(object):
         self.active_player_index = -1
         self.is_last_round = False
         self.gems = {'*': 5}
-        self.cards = {
-            'level1': [],
-            'level2': [],
-            'level3': [],
-        }
+        self.cards = {}
         self.decks = {
             'level1': level_1,
             'level2': level_2,
             'level3': level_3,
         }
-        self.updated_at = time.time()
-        self.shuffle()
 
-    def shuffle(self):
-        for deck in self.decks.values():
-            shuffle_deck(deck)
+        for level in LEVELS:
+            self.cards[level] = []
+            shuffle_deck(self.decks[level])
+            for card in self.decks[level]:
+                card.level = level
+
+        self.updated_at = time.time()
 
     def refill(self):
         for level in LEVELS:
@@ -505,8 +508,9 @@ class Game(object):
         for player in self.players:
             toDict = player.dict()
             if player.id != player_id:
-                toDict['n_reserved'] = len(toDict['reserved'])
-                del toDict['reserved']
+                for reserved in toDict['reserved']:
+                    restricted = [k for k in reserved if k != 'level']
+                    for k in restricted:
+                        del reserved[k]
             players.append(toDict)
-        print result
         return result

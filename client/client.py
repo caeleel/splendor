@@ -114,7 +114,7 @@ def print_state():
             count += 1
             print_card(card)
         print ''
-    for player in curr_state['players'].values():
+    for player in curr_state['players']:
         print_player(player)
 
 def set_state():

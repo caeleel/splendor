@@ -24,13 +24,14 @@
     return true;
   }
 
-  function mapColors(gems) {
+  function mapColors(gems, self, callback, symbol) {
     return gemColors.map(function(color) {
       var cName = color + "chip";
       if (color == '*') cName = "schip";
       return (
         <div className={"gem " + cName}>
           <div className="bubble">{gems[color]}</div>
+          <div className="underlay" onClick={callback.bind(self, color)}>{symbol}</div>
         </div>
       );
     });
@@ -88,32 +89,53 @@
   });
 
   var Card = React.createClass({
-    doCard: function() {
-    },
 
     render: function() {
-      var card = this.props.card;
+      var self = this;
+      var card = self.props.card;
+      var game = self.props.game;
+      var buyer = game.buy.bind(game, card.uuid);;
+      var reserver = game.reserve.bind(game, card.uuid);
 
-      return (
-        <div className="card" onClick={this.doCard} id={card.uuid}>
-          <div className="header">
-            <div className={"color " + card.color + "gem"}>
+      if (card.color) {
+        return (
+          <div
+            className = {"card card-" + card.color}
+            id = {card.uuid}
+          >
+            <div className="overlay">
+              <div className="act buy" onClick={buyer}>
+                <div className="plus">+</div>
+              </div>
+              <div className="act reserve" onClick={reserver}>
+                <img className="floppy" src="client/img/floppy.png" />
+              </div>
             </div>
-            <div className="points">
-              {card.points > 0 && card.points}
+            <div className="underlay">
+              <div className="header">
+                <div className={"color " + card.color + "gem"}>
+                </div>
+                <div className="points">
+                  {card.points > 0 && card.points}
+                </div>
+              </div>
+              <div className="costs">
+                {colors.map(function(color) {
+                  if(card.cost[color] > 0) {
+                    return (
+                      <div className={"cost " + color}>{card.cost[color]}</div>
+                    )
+                  }
+                })}
+              </div>
             </div>
           </div>
-          <div className="costs">
-            {colors.map(function(color) {
-              if(card.cost[color] > 0) {
-                return (
-                  <div className={"cost " + color}>{card.cost[color]}</div>
-                )
-              }
-            })}
-          </div>
-        </div>
-      );
+        );
+      } else {
+        return (
+          <div className = {"deck " + card.level}></div>
+        );
+      }
     }
   });
 
@@ -148,52 +170,76 @@
   var Player = React.createClass({
     render: function() {
       var self = this;
+      var game = self.props.game;
       var set = colors.map(function(color) {
         var cards = self.props.cards[color].map(function (card) {
           return (
-            <Card key={card.uuid} card={card} />
+            <div className="colorSetInner">
+              <Card key={card.uuid} card={card} game={game}/>
+            </div>
           );
         });
         return (
           <div className="colorSet">
             {cards}
+            <div className={cards.length > 0 ? "spacer" : "smallspacer"}></div>
           </div>
         );
       });
-      var gems = mapColors(self.props.gems);
+      var you = (game.props.pid == self.props.pid ? " you" : "");
+      var youName = (game.props.pid == self.props.pid ? " (you)" : "");
+      var gems = mapColors(self.props.gems, game, game.discard, 'X');
       var reserved = [];
       var reservedCount = 0;
       if (self.props.reserved) {
         reserved = self.props.reserved.map(function(card) {
           return (
             <div className="reserved">
-              <Card key={card.uuid} card={card} />
+              <Card key={card.uuid} card={card} game={game}/>
             </div>
           );
         });
         reservedCount = reserved.length;
       } else {
-        reservedCount = self.props.n_reserved;
+        reservedCount = self.props.nreserved;
       }
       var nobles = self.props.nobles.map(nobleMap);
       return (
-        <div className="player">
-          <div className="cards">
-            {set}
-          </div>
-          <div className="gems">
-            {gems}
-            <div className="breaker"></div>
-          </div>
-          <div className="reserveArea">
-            {reservedCount} reserved
-            <div className="reserveCards">
-              {reserved}
+        <div className={"player" + you}>
+          {game.state.turn == self.props.pid &&
+            <div className="turnIndicator">&#9654;</div>
+          }
+          <div className="playerName">{self.props.name + youName}</div>
+          <div className="playerPoints">{self.props.points}</div>
+          <div className="breaker"></div>
+          <div className="floater">
+            <div className="cards">
+              {set}
+              <div className="breaker"></div>
+            </div>
+            <div className="gems">
+              {gems}
+              <div className="breaker"></div>
+            </div>
+            <div className="reserveArea">
+              { reservedCount > 0 &&
+                <div>
+                  <div className="reserveText">
+                    reserved
+                  </div>
+                  <div className="reserveCards">
+                    {reserved}
+                    <div className="breaker"></div>
+                  </div>
+                  <div className="breaker"></div>
+                </div>
+              }
             </div>
           </div>
           <div className="nobles">
             {nobles}
           </div>
+          <div className="breaker"></div>
         </div>
       );
     }
@@ -203,10 +249,11 @@
     render: function() {
       var cards = [];
       var self = this;
+      var game = self.props.game;
       if (self.props.cards) {
         cards = self.props.cards.map(function(card) {
           return (
-              <Card key={card.uuid} card={card} />
+              <Card key={card.uuid} card={card} game={game}/>
           )
         });
       }
@@ -216,6 +263,11 @@
           <div className={"deck " + self.props.name}>
             <div className="remaining">
               {self.props.remaining}
+            </div>
+            <div className="overlay">
+              <div className="act reserve" onClick={game.reserve.bind(game, self.props.name)}>
+                <img className="floppy" src="client/img/floppy.png" />
+              </div>
             </div>
           </div>
           <div className={"c_" + self.props.name}>
@@ -269,6 +321,36 @@
       return '?pid=' + this.props.pid + '&uuid=' + this.props.uuid;
     },
 
+    take: function(color) {
+      this.act('take', color);
+    },
+
+    discard: function(color) {
+      this.act('discard', color);
+    },
+
+    buy: function(uuid) {
+      this.act('buy', uuid);
+    },
+
+    reserve: function(uuid) {
+      this.act('reserve', uuid);
+    },
+
+    noble: function(uuid) {
+      this.act('noble_visit', uuid);
+    },
+
+    act: function(action, target) {
+      var self = this;
+      this.request = $.post(
+        '/game/' + this.props.gid + '/' + action + '/' + target + this.loginArgs(),
+        function(resp) {
+          if (!showError(resp)) self.updateState(resp);
+        }
+      );
+    },
+
     nextTurn: function() {
       var self = this;
       this.request = $.post(
@@ -318,21 +400,27 @@
           <div>
             <Player
               key = {player.uuid}
+              pid = {player.id}
+              name = {player.name}
+              points = {player.score}
+              game = {self}
               cards = {player.cards}
               nobles = {player.nobles}
               gems = {player.gems}
               reserved = {player.reserved}
+              nreserved = {player.n_reserved}
             />
           </div>
         );
       });
-      var gems = mapColors(self.state.gems);
+      var gems = mapColors(self.state.gems, self, self.take, '+');
       var nobles = self.state.nobles.map(nobleMap);
       var levels = levelNames.map(function(level) {
         return (
           <div className="level">
             <Level
               key = {level}
+              game = {self}
               name = {level}
               cards = {self.state.cards[level]}
               remaining = {self.state.decks[level]}
@@ -341,25 +429,29 @@
         )
       });
       return (
-        <div id="game-board">
-          <div id="common-area">
-            <div id="noble-area">
-              {nobles}
-              <div className='breaker'></div>
+        <div>
+          <div id="game-board">
+            <div id="common-area">
+              <div id="noble-area">
+                {nobles}
+                <div className='breaker'></div>
+              </div>
+              <div>
+                <div id="level-area">
+                  {levels}
+                </div>
+                <div id="gem-area" className="you">
+                  {gems}
+                </div>
+                <div className="breaker"></div>
+              </div>
             </div>
-            <div>
-              <div id="level-area">
-                {levels}
-              </div>
-              <div id="gem-area">
-                {gems}
-              </div>
-              <div className="breaker"></div>
+            <div id="player-area">
+              {players}
             </div>
           </div>
-          <div id="player-area">
-            {players}
-          </div>
+          <div id="pass-turn" onClick={self.nextTurn.bind(self)}>Pass turn</div>
+          <div id="error-box"><div id="error-box-inner"></div></div>
         </div>
       );
     }
@@ -368,17 +460,20 @@
   var GameCreator = React.createClass({
     join: function(game) {
       var self = this;
-      $.post('/join/' + game, function(resp) {
-        if (!showError(resp)) {
-          self.setState({
-            joined: true,
-            pid: resp.id,
-            uuid: resp.uuid,
-            gid: game,
-            name: self.state.userName,
-          });
-          self.save();
-        }
+      $.post('/join/' + game, JSON.stringify({
+          name: self.state.userName,
+        }), function(resp) {
+          if (!showError(resp)) {
+            self.setState({
+              joined: true,
+              pid: resp.id,
+              uuid: resp.uuid,
+              gid: game,
+              title: resp.title,
+              name: self.state.userName,
+            });
+            self.save();
+          }
       });
     },
 
@@ -474,7 +569,7 @@
                     onChange = {this.handleChange} />
                 </div>
                 <div>
-                  <input type="submit" value="Let's play!" />
+                  <input className="inputButton" type="submit" value="Let's play!" />
                 </div>
               </form>
             </div>
