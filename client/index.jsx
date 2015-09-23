@@ -290,6 +290,7 @@
         cards: {},
         decks: {},
         nobles: [],
+        log: [],
         turn: -1,
         phase: "pregame",
       };
@@ -308,6 +309,7 @@
         }
 
         this.setState({
+          log: r.state.log,
           cards: r.state.cards,
           decks: r.state.decks,
           players: r.state.players,
@@ -315,6 +317,8 @@
           nobles: r.state.nobles,
           turn: r.state.turn,
         });
+        var scroller = document.getElementById("log-scroller");
+        scroller.scrollTop = scroller.scrollHeight;
       }
     },
 
@@ -418,6 +422,11 @@
       });
       var gems = mapColors(self.state.gems, self, self.take, '+');
       var nobles = mapNobles(self.state.nobles, self);
+      var log = self.state.log.map(function(logLine) {
+        return (
+          <div className="log-line">{logLine}</div>
+        );
+      });
       var levels = levelNames.map(function(level) {
         return (
           <div className="level">
@@ -453,7 +462,14 @@
               {players}
             </div>
           </div>
+          <div id="log-box">
+            <div id="log-title">::Log</div>
+            <div id="log-scroller">
+              {log}
+            </div>
+          </div>
           <div id="pass-turn" onClick={self.nextTurn.bind(self)}>Pass turn</div>
+          <div id="log-toggle">Press 'L' to toggle log</div>
           <div id="error-box"><div id="error-box-inner"></div></div>
         </div>
       );
@@ -580,6 +596,13 @@
           </div>
         );
       }
+    }
+  });
+
+  $(document).on("keypress", function (e) {
+    console.log(e.which);
+    if (e.which == 108) {
+      $("#log-box").toggle();
     }
   });
 

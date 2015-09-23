@@ -4,6 +4,13 @@ import time
 
 COLORS = ('b', 'u', 'w', 'g', 'r')
 LEVELS = ('level1', 'level2', 'level3')
+COLOR_DICT = {
+    'b': 'chocolate',
+    'u': 'sapphire',
+    'w': 'diamond',
+    'g': 'emerald',
+    'r': 'ruby',
+}
 
 class Player(object):
     def __init__(self, game, id, name=None):
@@ -90,11 +97,18 @@ class Player(object):
         self.acted = True
         self.gems['*'] -= owed
         self.game.gems['*'] += owed
+        payed = []
         for c in COLORS:
             if card.cost[c] > len(self.cards[c]):
                 pay = min(card.cost[c] - len(self.cards[c]), self.gems[c])
+                if pay > 0:
+                    payed.append("{0} {1}".format(pay, COLOR_DICT[c]))
                 self.gems[c] -= pay
                 self.game.gems[c] += pay
+        pay_string = ', '.join(payed)
+        if pay_string == '':
+            pay_string = 'nothing'
+        self.game.log.append("{0} paid {1} for a {2}".format(self.name, pay_string, card))
         self.cards[card.color].append(card)
 
         return {}
@@ -104,6 +118,7 @@ class Player(object):
             return {'error': "You don't have any of that gem"}
         self.gems[color] -= 1
         self.game.gems[color] += 1
+        self.game.log.append("{0} discarded 1 {1}".format(self.name, COLOR_DICT[color]))
         if color in self.taken:
             self.taken.remove(color)
         return {}
@@ -119,12 +134,14 @@ class Player(object):
         if uuid in LEVELS:
             if not self.game.decks[uuid]:
                 return {'error': "No more cards in pile to reserve"}
+            self.game.log.append("{0} reserved a {1} card".format(self.name, uuid))
             self.reserved.append(self.game.decks[uuid].pop())
             return {}
 
         for level in LEVELS:
             card = find_uuid(uuid, self.game.cards[level])
             if card:
+                self.game.log.append("{0} reserved a {1}".format(self.name, card))
                 self.reserved.append(card)
                 self.game.cards[level].remove(card)
                 return {}
@@ -148,6 +165,7 @@ class Player(object):
         self.game.gems[color] -= 1
         self.gems[color] += 1
         self.taken.append(color)
+        self.game.log.append("{0} took 1 {1}".format(self.name, COLOR_DICT[color]))
         if len(self.taken) == 2 and self.taken[0] == self.taken[1] or len(self.taken) == 3:
             self.acted = True
         return {}
@@ -163,6 +181,7 @@ class Player(object):
         self.visited = True
         self.nobles.append(noble)
         self.game.nobles.remove(noble)
+        self.game.log.append("{0} was visited by a {1}".format(self.name, noble))
         return {}
 
     def check_noble(self, noble):
@@ -229,6 +248,11 @@ class Card(object):
             'r': r,
         }
 
+    def __str__(self):
+        result = "{0} card worth {1}, costing ".format(COLOR_DICT[self.color], self.points)
+        costs = ["{0} {1}".format(v, COLOR_DICT[k]) for k, v in self.cost.iteritems() if v > 0]
+        return result + ', '.join(costs)
+
     def dict(self):
         return {
             'color': self.color,
@@ -266,6 +290,11 @@ class Noble(object):
             'r': r,
             'b': b,
         }
+
+    def __str__(self):
+        result = "noble worth {1}, seeking ".format(self.points)
+        costs = ["{0} {1}".format(v, COLOR_DICT[k]) for k, v in self.requirement.iteritems() if v > 0]
+        return result + ', '.join(costs)
 
     def dict(self):
         return {
@@ -390,6 +419,7 @@ class Game(object):
         self.num_players = 0
         self.state = 'pregame'
         self.players = []
+        self.log = []
         self.active_player_index = -1
         self.is_last_round = False
         self.gems = {'*': 5}
@@ -500,6 +530,7 @@ class Game(object):
         result = {
             'players': [],
             'cards': {},
+            'log': self.log,
             'gems': self.gems,
             'nobles': array_dict(self.nobles),
             'decks': {},

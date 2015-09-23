@@ -163,7 +163,7 @@ button, .inputButton {
 
 #player-area {
   height: 680px;
-  width: 500px;
+  width: 480px;
   position: absolute;
   right: 0px;
   top: 65px;
@@ -302,7 +302,7 @@ button, .inputButton {
 }
 
 .floater {
-  width: 420px;
+  width: 400px;
   float: left;
 }
 
@@ -486,9 +486,9 @@ button, .inputButton {
 }
 
 .gem {
-  background-size: 80px 80px;
-  width: 80px;
-  height: 80px;
+  background-size: 76px 76px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   margin-bottom: 7px;
   box-shadow: 4px 4px 4px #c2c2c2;
@@ -501,9 +501,9 @@ button, .inputButton {
 
 .you .gem .underlay {
   position: absolute;
-  width: 80px;
-  height: 76px;
-  padding-top: 4px;
+  width: 76px;
+  height: 74px;
+  padding-top: 2px;
   text-align: center;
   -webkit-text-stroke-color: white;
   -webkit-text-stroke-width: 0;
@@ -515,6 +515,59 @@ button, .inputButton {
 
 .gem .underlay {
   display: none;
+}
+
+#log-toggle {
+  position: absolute;
+  bottom: 5px;
+  left: 260px;
+  color: #d0d0d0;
+  font-style: normal;
+  text-shadow: -1px -1px 0px #bbb;
+  -webkit-text-fill-color: #d5d5d5;
+  -webkit-text-stroke-width: 0;
+  opacity: 0.5;
+  z-index: -1;
+}
+
+#log-box {
+  font-family: monospace;
+  font-weight: normal;
+  font-style: normal;
+  opacity: 0.9;
+  background-color: white;
+  padding-top: 30px;
+  padding-bottom: 10px;
+  width: 500px;
+  height: 500px;
+  position: absolute;
+  left: 110px;
+  bottom: -4px;
+  border: 2px solid black;
+  border-bottom: none;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  display: none;
+  z-index: 3;
+}
+
+#log-scroller {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#log-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 3px 10px 3px 10px;
+  width: 480px;
+  border-bottom: 1px solid black;
+  margin-bottom: 5px;
+}
+
+.log-line {
+  padding: 2px 10px 0px 10px;
 }
 
 .player .gem {
