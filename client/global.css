@@ -132,18 +132,26 @@ button, .inputButton {
 #common-area {
   height: 680px;
   width: 764px;
-  float: left;
+  position: absolute;
+  left: 10px;
+  top: 65px;
 }
 
 #noble-area {
   height: 140px;
   width: 100%;
   margin-bottom: 10px;
+  zoom: 0.8;
+  -moz-transform: scale(0.8);
+}
+
+#noble-area .noble {
+  cursor: pointer;
 }
 
 #level-area {
   height: 540px;
-  width: 680px;
+  width: 640px;
   float: left;
 }
 
@@ -156,7 +164,9 @@ button, .inputButton {
 #player-area {
   height: 680px;
   width: 500px;
-  float: right;
+  position: absolute;
+  right: 0px;
+  top: 65px;
 }
 
 .noble {
@@ -172,9 +182,9 @@ button, .inputButton {
 
 .card, .deck {
   float: left;
-  margin-right: 12px;
+  margin-right: 10px;
   margin-bottom: 22px;
-  width: 120px;
+  width: 115px;
   height: 160px;
   border-radius: 7px;
   position: relative;
@@ -240,7 +250,7 @@ button, .inputButton {
 
 .reserveCards {
   float: left;
-  width: 310px;
+  width: 295px;
   height: 125px;
   border-radius: 5px;
   padding: 10px;
@@ -278,7 +288,7 @@ button, .inputButton {
 }
 
 .spacer, .smallspacer {
-  width: 120px;
+  width: 115px;
   margin-right: 13px;
   margin-bottom: 40px;
 }
@@ -302,6 +312,7 @@ button, .inputButton {
 
 .player .noble {
   float: none;
+  margin-bottom: 10px;
   zoom: 0.5;
   -moz-transform: scale(0.5);
 }
@@ -391,7 +402,7 @@ button, .inputButton {
 
 .header {
   height: 44px;
-  width: 115px;
+  width: 110px;
   padding-left: 5px;
   top: 0px;
   position: absolute;
@@ -583,7 +594,7 @@ button, .inputButton {
 
 .deck {
   background-color: white;
-  background-size: 114px 154px;
+  background-size: 109px 154px;
   background-repeat: no-repeat;
   background-position: center;
 }

@@ -24,25 +24,27 @@
     return true;
   }
 
-  function mapColors(gems, self, callback, symbol) {
+  function mapColors(gems, game, callback, symbol) {
     return gemColors.map(function(color) {
       var cName = color + "chip";
       if (color == '*') cName = "schip";
       return (
         <div className={"gem " + cName}>
           <div className="bubble">{gems[color]}</div>
-          <div className="underlay" onClick={callback.bind(self, color)}>{symbol}</div>
+          <div className="underlay" onClick={callback.bind(game, color)}>{symbol}</div>
         </div>
       );
     });
   }
 
-  function nobleMap(noble) {
-    return (
-      <div>
-        <Noble key={noble.uuid} noble={noble} />
-      </div>
-    );
+  function mapNobles(nobles, game) {
+    return nobles.map(function(noble) {
+      return (
+        <div>
+          <Noble key={noble.uuid} noble={noble} game={game}/>
+        </div>
+      );
+    });
   }
 
   var AvailableGames = React.createClass({
@@ -140,14 +142,13 @@
   });
 
   var Noble = React.createClass({
-    doCard: function() {
-    },
-
     render: function() {
       var noble = this.props.noble;
+      var game = this.props.game;
+      var visit = game.noble.bind(game, noble.uuid);
 
       return (
-        <div className="noble" onClick={this.doCard} id={noble.uuid}>
+        <div className="noble" onClick={visit} id={noble.uuid}>
           <div className="side-bar">
             <div className="points">
               {noble.points > 0 && noble.points}
@@ -203,7 +204,7 @@
       } else {
         reservedCount = self.props.nreserved;
       }
-      var nobles = self.props.nobles.map(nobleMap);
+      var nobles = mapNobles(self.props.nobles, game);
       return (
         <div className={"player" + you}>
           {game.state.turn == self.props.pid &&
@@ -326,7 +327,9 @@
     },
 
     discard: function(color) {
-      this.act('discard', color);
+      if (confirm("Are you sure you want to discard a gem?")) {
+        this.act('discard', color);
+      }
     },
 
     buy: function(uuid) {
@@ -414,7 +417,7 @@
         );
       });
       var gems = mapColors(self.state.gems, self, self.take, '+');
-      var nobles = self.state.nobles.map(nobleMap);
+      var nobles = mapNobles(self.state.nobles, self);
       var levels = levelNames.map(function(level) {
         return (
           <div className="level">

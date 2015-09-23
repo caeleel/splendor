@@ -61,6 +61,8 @@ class Player(object):
     def buy(self, uuid):
         if self.acted:
             return {'error': "You've already used your action"}
+        if self.taken:
+            return {'error': "You've already taken gems, cheater"}
         owed = 0
 
         card = find_uuid(uuid, self.reserved)
@@ -85,7 +87,6 @@ class Player(object):
         else:
             self.game.cards[found_level].remove(card)
 
-        self.cards[card.color].append(card)
         self.acted = True
         self.gems['*'] -= owed
         self.game.gems['*'] += owed
@@ -94,6 +95,8 @@ class Player(object):
                 pay = min(card.cost[c] - len(self.cards[c]), self.gems[c])
                 self.gems[c] -= pay
                 self.game.gems[c] += pay
+        self.cards[card.color].append(card)
+
         return {}
 
     def discard(self, color):
@@ -101,6 +104,8 @@ class Player(object):
             return {'error': "You don't have any of that gem"}
         self.gems[color] -= 1
         self.game.gems[color] += 1
+        if color in self.taken:
+            self.taken.remove(color)
         return {}
 
     def reserve(self, uuid):
@@ -112,9 +117,9 @@ class Player(object):
             self.game.gems['*'] -= 1
             self.gems['*'] += 1
         if uuid in LEVELS:
-            if not self.game.cards[uuid]:
+            if not self.game.decks[uuid]:
                 return {'error': "No more cards in pile to reserve"}
-            self.reserved.append(self.game.cards[uuid].pop())
+            self.reserved.append(self.game.decks[uuid].pop())
             return {}
 
         for level in LEVELS:
