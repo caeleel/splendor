@@ -292,7 +292,7 @@ class Noble(object):
         }
 
     def __str__(self):
-        result = "noble worth {1}, seeking ".format(self.points)
+        result = "noble worth {0}, seeking ".format(self.points)
         costs = ["{0} {1}".format(v, COLOR_DICT[k]) for k, v in self.requirement.iteritems() if v > 0]
         return result + ', '.join(costs)
 

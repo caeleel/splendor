@@ -165,7 +165,7 @@ button, .inputButton {
   height: 680px;
   width: 480px;
   position: absolute;
-  right: 0px;
+  right: 5px;
   top: 65px;
 }
 
@@ -518,7 +518,7 @@ button, .inputButton {
 }
 
 #log-toggle {
-  position: absolute;
+  position: fixed;
   bottom: 5px;
   left: 260px;
   color: #d0d0d0;
@@ -540,7 +540,7 @@ button, .inputButton {
   padding-bottom: 10px;
   width: 500px;
   height: 500px;
-  position: absolute;
+  position: fixed;
   left: 110px;
   bottom: -4px;
   border: 2px solid black;
