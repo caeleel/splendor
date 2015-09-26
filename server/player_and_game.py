@@ -2,6 +2,7 @@ import random
 import uuid
 import time
 
+MAX_PLAYERS = 4
 COLORS = ('b', 'u', 'w', 'g', 'r')
 LEVELS = ('level1', 'level2', 'level3')
 COLOR_DICT = {
@@ -418,9 +419,11 @@ class Game(object):
 
         self.num_players = 0
         self.state = 'pregame'
-        self.players = []
+        self.players = [None] * MAX_PLAYERS
+        self.pids = []
         self.log = []
         self.active_player_index = -1
+        self.spectator_index = MAX_PLAYERS
         self.is_last_round = False
         self.gems = {'*': 5}
         self.cards = {}
@@ -445,7 +448,8 @@ class Game(object):
 
     def add_player(self, name):
         player = Player(self, self.num_players, name)
-        self.players.append(player)
+        self.pids.append(player.id)
+        self.players[player.id] = player
         self.num_players += 1
         self.nobles.append(self.noble_pool[self.num_players])
         if self.num_players == 2:
@@ -457,6 +461,14 @@ class Game(object):
         if self.num_players == 4:
             for c in COLORS:
                 self.gems[c] = 7
+        return (player.id, player.uuid)
+
+    def add_spectator(self, name):
+
+        player = Player(self, self.spectator_index, name)
+        self.pids.append(player.id)
+        self.players.append(player)
+        self.spectator_index += 1
         return (player.id, player.uuid)
 
     def start_game(self):
@@ -524,7 +536,7 @@ class Game(object):
     def dict(self, player_id=None):
         if player_id is None:
             player_id = self.active_player_index
-        if player_id >= self.num_players:
+        if player_id not in self.pids:
             return {}
 
         result = {
@@ -541,7 +553,7 @@ class Game(object):
             result['decks'][level] = len(self.decks[level])
 
         players = result['players']
-        for player in self.players:
+        for player in self.players[:self.num_players]:
             toDict = player.dict()
             if player.id != player_id:
                 for reserved in toDict['reserved']:

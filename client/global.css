@@ -169,6 +169,13 @@ button, .inputButton {
   top: 65px;
 }
 
+.spectate-button {
+  margin-left: 10px;
+  cursor: pointer;
+  font-style: normal;
+  font-size: 15px;
+}
+
 .noble {
   float: left;
   margin-right: 12px;
@@ -348,22 +355,58 @@ button, .inputButton {
   background-position: center;
 }
 
-.card-g {
+.card-g.card-level1 {
+  background-image: url('img/forest.jpg');
+  background-size: 284px 160px;
+  background-position: center;
+}
+
+.card-g.card-level2 {
   background-image: url('img/ship.jpg');
   background-size: 284px 160px;
   background-position: center;
 }
 
-.card-b {
+.card-g.card-level3 {
+  background-image: url('img/palace.jpg');
+  background-size: 279px 160px;
+  background-position: center;
+}
+
+.card-b.card-level2 {
   background-image: url('img/desert.jpg');
   background-size: 334px 160px;
   background-position: center;
 }
 
-.card-w {
+.card-b.card-level2 {
+  background-image: url('img/desert.jpg');
+  background-size: 334px 160px;
+  background-position: center;
+}
+
+.card-b.card-level3 {
+  background-image: url('img/village.png');
+  background-size: 334px 160px;
+  background-position: center;
+}
+
+.card-w.card-level1 {
   background-image: url('img/mountain.jpg');
   background-size: 284px 160px;
   background-position: center;
+}
+
+.card-w.card-level2 {
+  background-image: url('img/mountain.jpg');
+  background-size: 284px 160px;
+  background-position: center;
+}
+
+.card-w.card-level3 {
+  background-image: url('img/fortress.jpg');
+  background-size: 284px 160px;
+  background-position: left;
 }
 
 .card-u {

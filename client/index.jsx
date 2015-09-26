@@ -24,12 +24,12 @@
     return true;
   }
 
-  function mapColors(gems, game, callback, symbol) {
+  function mapColors(gems, game, callback, symbol, uuid) {
     return gemColors.map(function(color) {
       var cName = color + "chip";
       if (color == '*') cName = "schip";
       return (
-        <div className={"gem " + cName}>
+        <div className={"gem " + cName} key={color + "_colors_" + uuid}>
           <div className="bubble">{gems[color]}</div>
           <div className="underlay" onClick={callback.bind(game, color)}>{symbol}</div>
         </div>
@@ -40,9 +40,7 @@
   function mapNobles(nobles, game) {
     return nobles.map(function(noble) {
       return (
-        <div>
-          <Noble key={noble.uuid} noble={noble} game={game}/>
-        </div>
+        <Noble key={noble.uuid} noble={noble} game={game}/>
       );
     });
   }
@@ -59,8 +57,12 @@
       $.get('/list', function(r) { self.setState(r); });
     },
 
-    handleClick: function(game) {
-      this.props.joinFunc(game);
+    join: function(game) {
+      this.props.joinFunc(game, 'join');
+    },
+
+    spectate: function(game) {
+      this.props.joinFunc(game, 'spectate');
     },
 
     render: function() {
@@ -73,7 +75,7 @@
               return (
                 <li key={g.uuid}>
                   <span
-                    onClick   = {self.handleClick.bind(self, g.uuid)}
+                    onClick   = {self.join.bind(self, g.uuid)}
                     className = "game-title"
                   >
                     {g.title}
@@ -81,6 +83,10 @@
                   <span className="game-playerCount">
                     ({g.n_players} players)
                   </span>
+                  <span
+                    onClick = {self.spectate.bind(self, g.uuid)}
+                    className = "spectate-button"
+                  >(spectate)</span>
                 </li>
               );
             })}
@@ -102,7 +108,7 @@
       if (card.color) {
         return (
           <div
-            className = {"card card-" + card.color}
+            className = {"card card-" + card.color + " card-" + card.level}
             id = {card.uuid}
           >
             <div className="overlay">
@@ -125,7 +131,12 @@
                 {colors.map(function(color) {
                   if(card.cost[color] > 0) {
                     return (
-                      <div className={"cost " + color}>{card.cost[color]}</div>
+                      <div
+                        key={card.uuid + "_cost_" + color}
+                        className={"cost " + color}
+                      >
+                        {card.cost[color]}
+                      </div>
                     )
                   }
                 })}
@@ -157,7 +168,12 @@
               {colors.map(function(color) {
                 if(noble.requirement[color] > 0) {
                   return (
-                    <div className={"requires " + color}>{noble.requirement[color]}</div>
+                    <div
+                      key={noble.uuid + "_req_" + color}
+                      className={"requires " + color}
+                    >
+                      {noble.requirement[color]}
+                    </div>
                   )
                 }
               })}
@@ -175,13 +191,16 @@
       var set = colors.map(function(color) {
         var cards = self.props.cards[color].map(function (card) {
           return (
-            <div className="colorSetInner">
+            <div
+              key={self.props.pid + "_card_" + card.uuid}
+              className="colorSetInner"
+            >
               <Card key={card.uuid} card={card} game={game}/>
             </div>
           );
         });
         return (
-          <div className="colorSet">
+          <div key={self.props.pid + "_set_" + color} className="colorSet">
             {cards}
             <div className={cards.length > 0 ? "spacer" : "smallspacer"}></div>
           </div>
@@ -189,15 +208,13 @@
       });
       var you = (game.props.pid == self.props.pid ? " you" : "");
       var youName = (game.props.pid == self.props.pid ? " (you)" : "");
-      var gems = mapColors(self.props.gems, game, game.discard, 'X');
+      var gems = mapColors(self.props.gems, game, game.discard, 'X', self.props.pid);
       var reserved = [];
       var reservedCount = 0;
       if (self.props.reserved) {
         reserved = self.props.reserved.map(function(card) {
           return (
-            <div className="reserved">
-              <Card key={card.uuid} card={card} game={game}/>
-            </div>
+            <Card key={card.uuid + "_inner"} card={card} game={game}/>
           );
         });
         reservedCount = reserved.length;
@@ -404,40 +421,36 @@
       var self = this;
       var players = self.state.players.map(function(player) {
         return (
-          <div>
-            <Player
-              key = {player.uuid}
-              pid = {player.id}
-              name = {player.name}
-              points = {player.score}
-              game = {self}
-              cards = {player.cards}
-              nobles = {player.nobles}
-              gems = {player.gems}
-              reserved = {player.reserved}
-              nreserved = {player.n_reserved}
-            />
-          </div>
+          <Player
+            key = {player.uuid}
+            pid = {player.id}
+            name = {player.name}
+            points = {player.score}
+            game = {self}
+            cards = {player.cards}
+            nobles = {player.nobles}
+            gems = {player.gems}
+            reserved = {player.reserved}
+            nreserved = {player.n_reserved}
+          />
         );
       });
-      var gems = mapColors(self.state.gems, self, self.take, '+');
+      var gems = mapColors(self.state.gems, self, self.take, '+', 'game');
       var nobles = mapNobles(self.state.nobles, self);
-      var log = self.state.log.map(function(logLine) {
+      var log = self.state.log.map(function(logLine, i) {
         return (
-          <div className="log-line">{logLine}</div>
+          <div key={"line_" + i} className="log-line">{logLine}</div>
         );
       });
       var levels = levelNames.map(function(level) {
         return (
-          <div className="level">
-            <Level
-              key = {level}
-              game = {self}
-              name = {level}
-              cards = {self.state.cards[level]}
-              remaining = {self.state.decks[level]}
-            />
-          </div>
+          <Level
+            key = {level}
+            game = {self}
+            name = {level}
+            cards = {self.state.cards[level]}
+            remaining = {self.state.decks[level]}
+          />
         )
       });
       return (
@@ -468,7 +481,7 @@
               {log}
             </div>
           </div>
-          <div id="pass-turn" onClick={self.nextTurn.bind(self)}>Pass turn</div>
+          <div id="pass-turn" onClick={self.nextTurn}>Pass turn</div>
           <div id="log-toggle">Press 'L' to toggle log</div>
           <div id="error-box"><div id="error-box-inner"></div></div>
         </div>
@@ -477,9 +490,19 @@
   });
 
   var GameCreator = React.createClass({
-    join: function(game) {
+    join: function(game, act) {
+      if (act === undefined) {
+        act = 'join';
+      }
       var self = this;
-      $.post('/join/' + game, JSON.stringify({
+      var session = self.readSession();
+      if (session[game]) {
+        session[game]['joined'] = true;
+        self.setState(session[game]);
+        self.save();
+        return;
+      }
+      $.post('/' + act + '/' + game, JSON.stringify({
           name: self.state.userName,
         }), function(resp) {
           if (!showError(resp)) {
@@ -488,6 +511,7 @@
               pid: resp.id,
               uuid: resp.uuid,
               gid: game,
+              mode: act,
               title: resp.title,
               name: self.state.userName,
             });
@@ -505,11 +529,17 @@
       });
     },
 
+    readSession: function() {
+      var session = window.localStorage.getItem('splendor');
+      if (session === null) return {};
+      return JSON.parse(session);
+    },
+
     componentDidMount: function() {
-      var session = window.localStorage.getItem('session');
-      if (session === null) return;
-      session = JSON.parse(session);
-      this.setState(session);
+      var session = this.readSession();
+      if (session['default']) {
+        this.setState(session['default']);
+      }
     },
 
     getInitialState: function() {
@@ -531,7 +561,10 @@
     save: function() {
       var self = this;
       setTimeout(function() {
-        window.localStorage['session'] = JSON.stringify(self.state);
+        var session = self.readSession();
+        session['default'] = self.state;
+        session[self.state.gid] = self.state;
+        window.localStorage['splendor'] = JSON.stringify(session);
       }, 500);
     },
 
@@ -600,7 +633,6 @@
   });
 
   $(document).on("keypress", function (e) {
-    console.log(e.which);
     if (e.which == 108) {
       $("#log-box").toggle();
     }

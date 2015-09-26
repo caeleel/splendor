@@ -64,6 +64,13 @@ class GameManager(object):
 
         return {'title': self.title, 'id': pid, 'uuid': uuid}
 
+    def spectate_game(self, player_name):
+        pid, uuid = self.game.add_spectator(player_name)
+        self.changed[pid] = False
+        self.has_changed()
+
+        return {'title': self.title, 'id': pid, 'uuid': uuid}
+
     def start_game(self):
         if self.game.start_game():
             self.has_changed()
@@ -86,7 +93,7 @@ def validate_player(game):
         return None, None
 
     game_manager = game_map[game]
-    if game_manager.num_players() <= pid:
+    if pid not in game_manager.game.pids:
         return None, None
     if game_manager.game.players[pid].uuid != uuid:
         return None, None
@@ -110,8 +117,18 @@ def join_game(game):
         payload = request.get_json(force=True)
     if game not in game_map:
         return {'error': 'No such game'}
-    print payload
     return game_map[game].join_game(payload.get('name'))
+
+@app.route('/spectate/<game>', methods=['POST'])
+@json_response
+def spectate_game(game):
+    global game_map
+    payload = {}
+    if request.data:
+        payload = request.get_json(force=True)
+    if game not in game_map:
+        return {'error': 'No such game'}
+    return game_map[game].spectate_game(payload.get('name'))
 
 @app.route('/start/<game>/<starter>', methods=['POST'])
 @json_response
