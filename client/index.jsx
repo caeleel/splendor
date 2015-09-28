@@ -305,6 +305,7 @@
         players: [],
         gems: {},
         cards: {},
+        chat: [],
         decks: {},
         nobles: [],
         log: [],
@@ -334,8 +335,15 @@
           nobles: r.state.nobles,
           turn: r.state.turn,
         });
-        var scroller = document.getElementById("log-scroller");
-        scroller.scrollTop = scroller.scrollHeight;
+
+        if (r.chat) {
+          this.setState({chat: r.chat});
+        }
+
+        var scrollers = $('.scroller');
+        scrollers.map(function(scroller) {
+          scroller.scrollTop = scroller.scrollHeight;
+        });
       }
     },
 
@@ -417,6 +425,20 @@
       this.request.abort();
     },
 
+    chat: function(e) {
+      if (e.which == 13) {
+        var self = this;
+        this.request = $.post(
+          '/game/' + this.props.gid + '/chat' + this.loginArgs(),
+          JSON.stringify({msg: $('#chat-inner').val()}),
+          function(resp) {
+            if (!showError(resp)) self.updateState(resp);
+          }
+        );
+        $('#chat-inner').val('');
+      }
+    },
+
     render: function() {
       var self = this;
       var players = self.state.players.map(function(player) {
@@ -439,7 +461,18 @@
       var nobles = mapNobles(self.state.nobles, self);
       var log = self.state.log.map(function(logLine, i) {
         return (
-          <div key={"line_" + i} className="log-line">{logLine}</div>
+          <div key={"log-line-" + i} className="line">
+            <span className="pid">{"[" + logLine.pid + "] "}</span>
+            <span className="msg">{logLine.msg}</span>
+          </div>
+        );
+      });
+      var chat = self.state.chat.map(function(chatLine, i) {
+        return (
+          <div key={"chat-line-" + i} className="line">
+            <span className="name">{chatLine.name + ": "}</span>
+            <span className="msg">{chatLine.msg}</span>
+          </div>
         );
       });
       var levels = levelNames.map(function(level) {
@@ -476,13 +509,24 @@
             </div>
           </div>
           <div id="log-box">
-            <div id="log-title">::Log</div>
-            <div id="log-scroller">
+            <div className="title">::Log</div>
+            <div className="scroller">
               {log}
+            </div>
+          </div>
+          <div id="chat-box">
+            <div className="title">::Chat</div>
+            <div className="scroller">
+              {chat}
+            </div>
+            <div id="chat">
+              <span id="prompt">&gt;</span>
+              <input id="chat-inner" type="text" onKeyPress={this.chat}></input>
             </div>
           </div>
           <div id="pass-turn" onClick={self.nextTurn}>Pass turn</div>
           <div id="log-toggle">Press 'L' to toggle log</div>
+          <div id="chat-toggle">Press 'C' to toggle chat</div>
           <div id="error-box"><div id="error-box-inner"></div></div>
         </div>
       );
@@ -633,8 +677,12 @@
   });
 
   $(document).on("keypress", function (e) {
-    if (e.which == 108) {
+    if ($('#chat-inner').is(':focus')) {
+      return;
+    } else if (e.which == 108) {
       $("#log-box").toggle();
+    } else if (e.which == 99) {
+      $("#chat-box").toggle();
     }
   });
 

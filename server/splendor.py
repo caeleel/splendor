@@ -27,6 +27,8 @@ class GameManager(object):
         game_map[self.uuid] = self
         self.game = Game()
         self.changed = {}
+        self.chats = []
+        self.ended = {}
         self.title = title if title else self.uuid
 
     def dict(self):
@@ -38,17 +40,40 @@ class GameManager(object):
         }
 
     def poll(self, pid):
+        global game_map
+
         while not self.changed[pid]:
             time.sleep(POLL_INTERVAL)
             yield " "
 
+        if self.ended.get(pid):
+            del self.ended[pid]
+            if not self.ended:
+                del game_map[self.uuid]
+
         self.changed[pid] = False
-        yield json.dumps({'state': self.game.dict(pid), 'result': {}})
+        yield json.dumps({'state': self.game.dict(pid), 'result': {}, 'chat': self.chats})
 
     def num_players(self):
         return self.game.num_players
 
+    def chat(self, pid, msg):
+        name = self.game.players[pid].name
+        self.chats.append({
+            'time': time.time(),
+            'pid': pid,
+            'name': name,
+            'msg': msg,
+        })
+        self.has_changed()
+        return {'state': self.game.dict(pid), 'result': {}, 'chat': self.chats}
+
     def has_changed(self):
+        global game_map
+
+        if self.game.state == 'postgame':
+            for pid in self.ended:
+                self.ended[pid] = True
         for p in self.changed:
             self.changed[p] = True
 
@@ -60,6 +85,7 @@ class GameManager(object):
 
         pid, uuid = self.game.add_player(player_name)
         self.changed[pid] = False
+        self.ended[pid] = False
         self.has_changed()
 
         return {'title': self.title, 'id': pid, 'uuid': uuid}
@@ -154,6 +180,21 @@ def next(game):
         game_manager.has_changed()
     return {'state': game.dict(pid), 'result': result}
 
+@app.route('/game/<game>/chat', methods=['POST'])
+@json_response
+def chat(game):
+    pid, game_manager = validate_player(game)
+    if game_manager is None:
+        return {'error': 'Invalid game / pid / uuid'}
+    payload = {}
+    if request.data:
+        payload = request.get_json(force=True)
+    if not payload.get('msg'):
+        return {'error': 'Need "msg" parameter'}
+    if not isinstance(payload['msg'], str) and not isinstance(payload['msg'], unicode):
+        return {'error': 'msg parameter must be string'}
+    return game_manager.chat(pid, payload['msg'])
+
 @app.route('/game/<game>/<action>/<target>', methods=['POST'])
 @json_response
 def act(game, action, target):
@@ -192,13 +233,15 @@ def stat_game(game):
     pid, game_manager = validate_player(game)
     if game_manager is None:
         return {'error': 'Invalid game / pid / uuid'}
-    return {'state': game_manager.game.dict(pid)}
+    return {'state': game_manager.game.dict(pid), 'chat': game_manager.chats}
 
 @app.route('/poll/<game>', methods=['GET'])
 def poll_game(game):
     pid, game = validate_player(game)
     if game is None:
-        return {'error': 'Invalid game / pid / uuid'}
+        return Response(json.dumps({'error': 'Invalid game / pid / uuid'}),
+                        content_type='application/json',
+                        status=404)
     return Response(game.poll(pid), content_type='application/json')
 
 @app.route('/')

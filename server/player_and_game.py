@@ -66,6 +66,9 @@ class Player(object):
         result += sum([n.points for n in self.nobles])
         return result
 
+    def tiebreak_score(self):
+        return self.score()*100 - sum([len(cards) for cards in self.cards.values()])
+
     def buy(self, uuid):
         if self.acted:
             return {'error': "You've already used your action"}
@@ -99,6 +102,8 @@ class Player(object):
         self.gems['*'] -= owed
         self.game.gems['*'] += owed
         payed = []
+        if owed:
+            payed.append("{0} gold".format(owed))
         for c in COLORS:
             if card.cost[c] > len(self.cards[c]):
                 pay = min(card.cost[c] - len(self.cards[c]), self.gems[c])
@@ -109,7 +114,7 @@ class Player(object):
         pay_string = ', '.join(payed)
         if pay_string == '':
             pay_string = 'nothing'
-        self.game.log.append("{0} paid {1} for a {2}".format(self.name, pay_string, card))
+        self.game.log("{0} paid {1} for a {2}".format(self.name, pay_string, card))
         self.cards[card.color].append(card)
 
         return {}
@@ -119,7 +124,7 @@ class Player(object):
             return {'error': "You don't have any of that gem"}
         self.gems[color] -= 1
         self.game.gems[color] += 1
-        self.game.log.append("{0} discarded 1 {1}".format(self.name, COLOR_DICT[color]))
+        self.game.log("{0} discarded 1 {1}".format(self.name, COLOR_DICT[color]))
         if color in self.taken:
             self.taken.remove(color)
         return {}
@@ -135,14 +140,14 @@ class Player(object):
         if uuid in LEVELS:
             if not self.game.decks[uuid]:
                 return {'error': "No more cards in pile to reserve"}
-            self.game.log.append("{0} reserved a {1} card".format(self.name, uuid))
+            self.game.log("{0} reserved a {1} card".format(self.name, uuid))
             self.reserved.append(self.game.decks[uuid].pop())
             return {}
 
         for level in LEVELS:
             card = find_uuid(uuid, self.game.cards[level])
             if card:
-                self.game.log.append("{0} reserved a {1}".format(self.name, card))
+                self.game.log("{0} reserved a {1}".format(self.name, card))
                 self.reserved.append(card)
                 self.game.cards[level].remove(card)
                 return {}
@@ -166,7 +171,7 @@ class Player(object):
         self.game.gems[color] -= 1
         self.gems[color] += 1
         self.taken.append(color)
-        self.game.log.append("{0} took 1 {1}".format(self.name, COLOR_DICT[color]))
+        self.game.log("{0} took 1 {1}".format(self.name, COLOR_DICT[color]))
         if len(self.taken) == 2 and self.taken[0] == self.taken[1] or len(self.taken) == 3:
             self.acted = True
         return {}
@@ -182,7 +187,7 @@ class Player(object):
         self.visited = True
         self.nobles.append(noble)
         self.game.nobles.remove(noble)
-        self.game.log.append("{0} was visited by a {1}".format(self.name, noble))
+        self.game.log("{0} was visited by a {1}".format(self.name, noble))
         return {}
 
     def check_noble(self, noble):
@@ -421,7 +426,8 @@ class Game(object):
         self.state = 'pregame'
         self.players = [None] * MAX_PLAYERS
         self.pids = []
-        self.log = []
+        self.logs = []
+        self.winner = None
         self.active_player_index = -1
         self.spectator_index = MAX_PLAYERS
         self.is_last_round = False
@@ -440,6 +446,13 @@ class Game(object):
                 card.level = level
 
         self.updated_at = time.time()
+
+    def log(self, msg):
+        self.logs.append({
+            'pid': self.active_player_index,
+            'time': int(time.time()),
+            'msg': msg,
+        })
 
     def refill(self):
         for level in LEVELS:
@@ -464,7 +477,6 @@ class Game(object):
         return (player.id, player.uuid)
 
     def add_spectator(self, name):
-
         player = Player(self, self.spectator_index, name)
         self.pids.append(player.id)
         self.players.append(player)
@@ -484,10 +496,21 @@ class Game(object):
         return DUMMY_PLAYER
 
     def next_turn(self):
+        if self.active_player().score() >= 15:
+            self.last_round();
         self.active_player_index = (self.active_player_index + 1) % self.num_players
-        self.active_player().start_turn()
-        self.refill()
+        if self.is_last_round and self.active_player_index == 0:
+            self.state = 'postgame'
+            self.winner = self.determine_winner()
+            self.active_player_index = -1
+        else:
+            self.active_player().start_turn()
+            self.refill()
         return {}
+
+    def determine_winner(self):
+        players = [(p.id, p.tiebreak_score()) for p in self.players[:self.num_players]]
+        return sorted(players)[-1][0]
 
     def last_round(self):
         self.is_last_round = True
@@ -542,10 +565,11 @@ class Game(object):
         result = {
             'players': [],
             'cards': {},
-            'log': self.log,
+            'log': self.logs,
             'gems': self.gems,
             'nobles': array_dict(self.nobles),
             'decks': {},
+            'winner': self.winner,
             'turn': self.active_player_index,
         }
         for level in LEVELS:

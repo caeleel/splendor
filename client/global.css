@@ -207,7 +207,7 @@ button, .inputButton {
 }
 
 #common-area .card:hover .overlay, .deck:hover .overlay, .reserveArea .card:hover .overlay {
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(0, 0, 0, 0.4);
   position: absolute;
   border-radius: 6px;
   top: 0;
@@ -230,7 +230,7 @@ button, .inputButton {
   font-size: 28px;
   text-align: center;
   margin-top: 65px;
-  margin-left: 44px;
+  margin-left: 41px;
   width: 29px;
   height: 29px;
   border: 3px solid white;
@@ -250,7 +250,7 @@ button, .inputButton {
 .reserve {
   position: absolute;
   bottom: 20px;
-  left: 45px;
+  left: 42px;
   height: 33px;
   width: 33px;
 }
@@ -349,9 +349,21 @@ button, .inputButton {
   -moz-transform: scale(0.75);
 }
 
-.card-r {
+.card-r.card-level1 {
   background-image: url('img/volcano.jpg');
   background-size: 284px 160px;
+  background-position: center;
+}
+
+.card-r.card-level2 {
+  background-image: url('img/dealer.jpg');
+  background-size: 187px 160px;
+  background-position: center;
+}
+
+.card-r.card-level3 {
+  background-image: url('img/fantasy.png');
+  background-size: 205px 160px;
   background-position: center;
 }
 
@@ -398,8 +410,8 @@ button, .inputButton {
 }
 
 .card-w.card-level2 {
-  background-image: url('img/mountain.jpg');
-  background-size: 284px 160px;
+  background-image: url('img/merchant.jpg');
+  background-size: 138px 160px;
   background-position: center;
 }
 
@@ -409,7 +421,19 @@ button, .inputButton {
   background-position: left;
 }
 
-.card-u {
+.card-u.card-level1 {
+  background-image: url('img/pond.jpg');
+  background-size: 284px 160px;
+  background-position: center;
+}
+
+.card-u.card-level2 {
+  background-image: url('img/island.jpg');
+  background-size: 213px 160px;
+  background-position: center;
+}
+
+.card-u.card-level3 {
   background-image: url('img/island.jpg');
   background-size: 213px 160px;
   background-position: center;
@@ -538,6 +562,10 @@ button, .inputButton {
   position: relative;
 }
 
+#common-area .schip .underlay {
+  display: none;
+}
+
 .you .gem:hover .underlay {
   display: block;
 }
@@ -560,10 +588,9 @@ button, .inputButton {
   display: none;
 }
 
-#log-toggle {
+#log-toggle, #chat-toggle {
   position: fixed;
   bottom: 5px;
-  left: 260px;
   color: #d0d0d0;
   font-style: normal;
   text-shadow: -1px -1px 0px #bbb;
@@ -573,7 +600,15 @@ button, .inputButton {
   z-index: -1;
 }
 
-#log-box {
+#log-toggle {
+  left: 260px;
+}
+
+#chat-toggle {
+  right: 50px;
+}
+
+#log-box, #chat-box {
   font-family: monospace;
   font-weight: normal;
   font-style: normal;
@@ -581,10 +616,7 @@ button, .inputButton {
   background-color: white;
   padding-top: 30px;
   padding-bottom: 10px;
-  width: 500px;
-  height: 500px;
   position: fixed;
-  left: 110px;
   bottom: -4px;
   border: 2px solid black;
   border-bottom: none;
@@ -594,22 +626,70 @@ button, .inputButton {
   z-index: 3;
 }
 
-#log-scroller {
+#log-box {
+  width: 500px;
+  height: 500px;
+  left: 110px;
+}
+
+#chat-box {
+  width: 250px;
+  height: 300px;
+  right: 20px;
+}
+
+#chat {
+  position: absolute;
+  bottom: 0;
+  width: 240px;
+  padding-top: 0;
+  padding-left: 5px;
+  padding-right: 5px;
+  height: 30px;
+  border-top: 1px solid black;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  margin: none;
+}
+
+#prompt {
+  position: relative;
+  top: 1px;
+}
+
+#chat-inner {
+  margin-left: 5px;
+  font-family: monospace;
+  height: 25px;
+  width: 210px;
+  outline: 0;
+  border: none;
+}
+
+.scroller {
   height: 100%;
   overflow-y: scroll;
 }
 
-#log-title {
+.title {
   position: absolute;
   top: 0;
   left: 0;
   padding: 3px 10px 3px 10px;
-  width: 480px;
   border-bottom: 1px solid black;
   margin-bottom: 5px;
 }
 
-.log-line {
+#log-box .title {
+  width: 480px;
+}
+
+#chat-box .title {
+  width: 230px;
+}
+
+.line {
   padding: 2px 10px 0px 10px;
 }
 
