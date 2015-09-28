@@ -342,7 +342,7 @@
 
         var scrollers = $('.scroller');
         scrollers.map(function(scroller) {
-          scroller.scrollTop = scroller.scrollHeight;
+          scrollers[scroller].scrollTop = scroller[scroller].scrollHeight;
         });
       }
     },
