@@ -638,6 +638,24 @@ button, .inputButton {
   right: 20px;
 }
 
+#drake {
+  position: fixed;
+  bottom: 36px;
+  border-bottom: 2px solid black;
+  border-top: 2px solid black;
+  border-right: 2px solid black;
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  -webkit-transition: width 0.3s; /* Safari */
+  transition: width 0.3s;
+  left: 0;
+}
+
+#drake:hover {
+  width: 300px;
+}
+
 #chat {
   position: absolute;
   bottom: 0;
