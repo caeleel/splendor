@@ -509,8 +509,8 @@ class Game(object):
         return {}
 
     def determine_winner(self):
-        players = [(p.id, p.tiebreak_score()) for p in self.players[:self.num_players]]
-        return sorted(players)[-1][0]
+        players = [(p.tiebreak_score(), p.id) for p in self.players[:self.num_players]]
+        return sorted(players)[-1][1]
 
     def last_round(self):
         self.is_last_round = True

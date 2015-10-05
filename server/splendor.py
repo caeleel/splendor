@@ -11,6 +11,27 @@ game_map = {}
 POLL_INTERVAL = 2
 client_dir = os.path.join(os.path.dirname(os.getcwd()), 'client')
 
+def check_auth(username, password):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    return username == 'shrek' and password == 'islove'
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Bark', 401,
+    {'WWW-Authenticate': 'Basic realm="Meow"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
 def json_response(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -245,6 +266,7 @@ def poll_game(game):
     return Response(game.poll(pid), content_type='application/json')
 
 @app.route('/')
+@requires_auth
 def index():
     return static_proxy('index.html')
 

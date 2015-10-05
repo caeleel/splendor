@@ -336,6 +336,10 @@
           turn: r.state.turn,
         });
 
+        if (r.state.winner) {
+          alert(r.state.players[r.state.winner].name + " wins!");
+        }
+
         if (r.chat) {
           this.setState({chat: r.chat});
         }
