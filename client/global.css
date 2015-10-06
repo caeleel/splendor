@@ -686,8 +686,15 @@ button, .inputButton {
 }
 
 .scroller {
-  height: 100%;
   overflow-y: scroll;
+}
+
+#log-box .scroller {
+  height: 100%;
+}
+
+#chat-box .scroller {
+  height: 275px;
 }
 
 .title {

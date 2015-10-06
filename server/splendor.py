@@ -270,6 +270,10 @@ def poll_game(game):
 def index():
     return static_proxy('index.html')
 
+@app.route('/favicon.ico')
+def favicon():
+    return static_proxy('favicon.ico')
+
 @app.route('/client/<path:filename>')
 def static_proxy(filename):
     return send_from_directory(client_dir, filename)

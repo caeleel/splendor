@@ -410,6 +410,10 @@
       if (r.state) {
         var myTurn = this.isMyTurn(r.state.turn);
         if (!myTurn) this.setState({ mode: "waiting" });else {
+          if (this.state.mode == "waiting") {
+            favicon.badge('!');
+            document.getElementById("notify").play();
+          }
           this.setState({ mode: "normal" });
         }
 
@@ -423,13 +427,28 @@
           turn: r.state.turn
         });
 
+        if (r.state.winner) {
+          alert(r.state.players[r.state.winner].name + " wins!");
+        }
+
         if (r.chat) {
+          var chat = this.state.chat;
+          if (chat && chat[chat.length - 1] && r.chat[r.chat.length - 1]) {
+            var lastLocalChat = chat[chat.length - 1];
+            var lastRemoteChat = r.chat[r.chat.length - 1];
+            if (lastLocalChat.msg != lastRemoteChat.msg && lastRemoteChat.pid != this.props.pid) {
+              favicon.badge('.');
+              document.getElementById("notify").play();
+            }
+          }
           this.setState({ chat: r.chat });
         }
 
         var scrollers = $('.scroller');
-        scrollers.map(function (scroller) {
-          scrollers[scroller].scrollTop = scrollers[scroller].scrollHeight;
+        scrollers.map(function (scroller, i) {
+          if (scrollers[scroller]) {
+            scrollers[scroller].scrollTop = scrollers[scroller].scrollHeight;
+          }
         });
       }
     },
@@ -861,10 +880,17 @@
     }
   });
 
+  var favicon = new Favico({
+    position: 'up'
+  });
+
+  $(document).click(function () {
+    favicon.badge('');
+  });
+
   React.render(React.createElement(
     'div',
     null,
     React.createElement(GameCreator, null)
   ), document.getElementById('content'));
 })();
-
