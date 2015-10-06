@@ -50,6 +50,8 @@ class GameManager(object):
         self.changed = {}
         self.chats = []
         self.ended = {}
+        self.created = time.time()
+        self.started = False
         self.title = title if title else self.uuid
 
     def dict(self):
@@ -121,6 +123,7 @@ class GameManager(object):
     def start_game(self):
         if self.game.start_game():
             self.has_changed()
+            self.started = True
             return {}
         else:
             return {'error': 'Could not start game'}
@@ -246,6 +249,12 @@ def act(game, action, target):
 @app.route('/list', methods=['GET'])
 @json_response
 def list_games():
+    delete_games = []
+    for k, v in game_map.iteritems():
+        if not v.started and time.time() - v.created > 600:
+            delete_games.append(k)
+    for game in delete_games:
+        del game_map[game]
     return {'games': [x.dict() for x in game_map.values()]}
 
 @app.route('/stat/<game>', methods=['GET'])

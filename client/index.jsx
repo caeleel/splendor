@@ -340,7 +340,7 @@
           turn: r.state.turn,
         });
 
-        if (r.state.winner) {
+        if (r.state.winner !== null) {
           alert(r.state.players[r.state.winner].name + " wins!");
         }
 
