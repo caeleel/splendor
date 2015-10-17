@@ -340,8 +340,9 @@
           turn: r.state.turn,
         });
 
-        if (r.state.winner !== null) {
+        if (r.state.winner !== null && this.state.phase != "postgame") {
           alert(r.state.players[r.state.winner].name + " wins!");
+          this.setState({phase: "postgame"});
         }
 
         if (r.chat) {
@@ -701,8 +702,12 @@
       return;
     } else if (e.which == 108) {
       $("#log-box").toggle();
+      var scroller = $('#log-box .scroller')[0];
+      scroller.scrollTop = scroller.scrollHeight;
     } else if (e.which == 99) {
       $("#chat-box").toggle();
+      var scroller = $('#chat-box .scroller')[0];
+      scroller.scrollTop = scroller.scrollHeight;
     }
   });
 

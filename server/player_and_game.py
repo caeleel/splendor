@@ -581,7 +581,7 @@ class Game(object):
             toDict = player.dict()
             if player.id != player_id:
                 for reserved in toDict['reserved']:
-                    restricted = [k for k in reserved if k != 'level']
+                    restricted = [k for k in reserved if k not in ('level', 'uuid')]
                     for k in restricted:
                         del reserved[k]
             players.append(toDict)
