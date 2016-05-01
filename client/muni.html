@@ -1,0 +1,79 @@
+<html>
+<head>
+<script src="jquery.js" type="application/javascript"></script>
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+<div id="lines">
+  <div class="line" id="5min"></div>
+  <div class="line" id="10min"></div>
+  <div class="line" id="15min"></div>
+</div>
+<div id="buses5">
+</div>
+<div id="buses5R">
+</div>
+<script>
+var timings = {};
+var buses = ["5", "5R"];
+var maxTime = 1200;
+
+function updateBuses() {
+  $.each(buses, function(i, r) {
+    $.get("http://webservices.nextbus.com/service/publicXMLFeed?command=predictions&a=sf-muni&r=" + r + "&s=5390", function(data) {
+      var predictions = data.firstChild.children[0].children[0];
+      if (predictions.tagName != "direction") return;
+
+      var results = {};
+      $.each(predictions.children, function(i, prediction) {
+        var secs = parseInt($(prediction).attr("seconds"));
+        var mins = parseInt($(prediction).attr("minutes"));
+        results[$(prediction).attr("vehicle")] = secs;
+      });
+      timings[r] = results;
+    });
+  });
+}
+
+updateBuses();
+
+setInterval(function() {
+  updateBuses();
+  $.each(buses, function(i, r) {
+    if (timings[r] !== undefined) {
+      var timing = timings[r];
+      var id = "#buses" + r;
+      var $buses = $(id);
+      $.each($buses.children(), function(i, el) {
+        var newTime = timing[el.id];
+        if (newTime !== undefined) {
+          var percent = Math.floor(newTime / 12);
+          if (percent > 100) $(el).remove();
+          else {
+            $(el).css({top: percent + "%"});
+            console.log(percent);
+          }
+        } else {
+          $(el).remove();
+        }
+      });
+      $.each(timing, function(k, v) {
+        if ($("#" + k).length === 0) {
+          var percent = Math.floor(v / 12);
+          if (percent <= 100) {
+            $("<div/>", {
+              id: k,
+              class: "bus",
+              css: {top: percent + "%"} 
+            }).appendTo(id);
+          }
+        }
+      });
+    }
+  });
+}, 2000);
+
+</script>
+</body>
+</html>

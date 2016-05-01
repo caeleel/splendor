@@ -253,6 +253,8 @@ def list_games():
     for k, v in game_map.iteritems():
         if not v.started and time.time() - v.created > 600:
             delete_games.append(k)
+        elif v.started and time.time() - v.created > 24*60*60:
+            delete_games.append(k)
     for game in delete_games:
         del game_map[game]
     return {'games': [x.dict() for x in game_map.values()]}
@@ -278,6 +280,10 @@ def poll_game(game):
 @requires_auth
 def index():
     return static_proxy('index.html')
+
+@app.route('/muni.html')
+def muni():
+    return static_proxy('muni.html')
 
 @app.route('/favicon.ico')
 def favicon():
