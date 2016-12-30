@@ -229,15 +229,14 @@
           }
           <div className="playerName">{self.props.name + youName}</div>
           <div className="playerPoints">{self.props.points}</div>
-          <div className="breaker"></div>
           <div className="floater">
-            <div className="cards">
-              {set}
-              <div className="breaker"></div>
+            <div className="cards-wrapper">
+              <div className="cards">
+                {set}
+              </div>
             </div>
             <div className="gems">
               {gems}
-              <div className="breaker"></div>
             </div>
             <div className="reserveArea">
               { reservedCount > 0 &&
@@ -247,9 +246,7 @@
                   </div>
                   <div className="reserveCards">
                     {reserved}
-                    <div className="breaker"></div>
                   </div>
-                  <div className="breaker"></div>
                 </div>
               }
             </div>
@@ -257,7 +254,6 @@
           <div className="nobles">
             {nobles}
           </div>
-          <div className="breaker"></div>
         </div>
       );
     }
@@ -288,10 +284,9 @@
               </div>
             </div>
           </div>
-          <div className={"c_" + self.props.name}>
+          <div className={"c_" + self.props.name + " face-up-cards"}>
             <div className="cards-inner">
               {cards}
-              <div className="breaker"></div>
             </div>
           </div>
         </div>
@@ -510,18 +505,18 @@
         <div>
           <div id="game-board">
             <div id="common-area">
-              <div id="noble-area">
-                {nobles}
-                <div className='breaker'></div>
-              </div>
-              <div>
+              <div className="split">
                 <div id="level-area">
                   {levels}
                 </div>
-                <div id="gem-area" className="you">
-                  {gems}
+              </div>
+              <div className="split">
+                <div id="noble-area">
+                  {nobles}
                 </div>
-                <div className="breaker"></div>
+              </div>
+              <div id="gem-area" className="you">
+                {gems}
               </div>
             </div>
             <div id="player-area">
