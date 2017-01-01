@@ -281,10 +281,6 @@ def poll_game(game):
 def index():
     return static_proxy('index.html')
 
-@app.route('/muni.html')
-def muni():
-    return static_proxy('muni.html')
-
 @app.route('/favicon.ico')
 def favicon():
     return static_proxy('favicon.ico')
@@ -295,4 +291,4 @@ def static_proxy(filename):
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='0.0.0.0', port=80, threaded=True)
+    app.run(host='0.0.0.0', port=8000, threaded=True)

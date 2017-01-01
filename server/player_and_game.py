@@ -286,8 +286,9 @@ def shuffle_deck(deck):
         deck[i] = x
 
 class Noble(object):
-    def __init__(self, p, w=0, u=0, g=0, r=0, b=0):
+    def __init__(self, nid, p, w=0, u=0, g=0, r=0, b=0):
         self.points = p
+        self.id = nid
         self.uuid = uuid.uuid4().hex
         self.requirement = {
             'w': w,
@@ -304,6 +305,7 @@ class Noble(object):
 
     def dict(self):
         return {
+            'id': self.id,
             'points': self.points,
             'uuid': self.uuid,
             'requirement': self.requirement,
@@ -408,16 +410,16 @@ class Game(object):
             Card('r', 5, 0, 0, 7, 3, 0),
         ]
         self.noble_pool = [
-            Noble(3, 0, 0, 0, 4, 4),
-            Noble(3, 3, 0, 3, 3, 0),
-            Noble(3, 0, 4, 4, 0, 0),
-            Noble(3, 4, 0, 4, 0, 0),
-            Noble(3, 0, 3, 0, 3, 3),
-            Noble(3, 0, 4, 0, 4, 0),
-            Noble(3, 0, 3, 3, 3, 0),
-            Noble(3, 4, 0, 0, 0, 4),
-            Noble(3, 3, 3, 3, 0, 0),
-            Noble(3, 3, 0, 0, 3, 3),
+            Noble(0, 3, 0, 0, 0, 4, 4),
+            Noble(1, 3, 3, 0, 3, 3, 0),
+            Noble(2, 3, 0, 4, 4, 0, 0),
+            Noble(3, 3, 4, 0, 4, 0, 0),
+            Noble(4, 3, 0, 3, 0, 3, 3),
+            Noble(5, 3, 0, 4, 0, 4, 0),
+            Noble(6, 3, 0, 3, 3, 3, 0),
+            Noble(7, 3, 4, 0, 0, 0, 4),
+            Noble(8, 3, 3, 3, 3, 0, 0),
+            Noble(9, 3, 3, 0, 0, 3, 3),
         ]
         shuffle_deck(self.noble_pool)
         self.nobles = self.noble_pool[:1]

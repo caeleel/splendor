@@ -5,6 +5,7 @@ body {
   background: #EEE;
   padding: 0;
   margin: 0;
+  width: 100%;
 }
 
 button, .inputButton {
@@ -86,8 +87,8 @@ button, .inputButton {
 }
 
 #game-board {
-  width: 96%;
-  padding-left: 10px;
+  margin: auto;
+  width: 740px;
   -webkit-text-fill-color: white;
   -webkit-text-stroke-width: 0.5px;
   -webkit-text-stroke-color: black;
@@ -107,8 +108,9 @@ button, .inputButton {
 .playerName, .turnIndicator{
   -webkit-text-fill-color: black;
   margin-bottom: 15px;
-  float: left;
   font-size: 20px;
+  display: inline-block;
+  cursor: pointer;
 }
 
 .turnIndicator {
@@ -117,12 +119,12 @@ button, .inputButton {
 }
 
 .playerPoints {
+  display: inline-block;
   font-style: normal;
   width: 25px;
   height: 25px;
   text-align: center;
   background-color: black;
-  float: left;
   font-size: 20px;
   margin-left: 10px;
   border-radius: 3px;
@@ -131,42 +133,66 @@ button, .inputButton {
 
 #common-area {
   height: 680px;
-  width: 764px;
-  position: absolute;
-  left: 10px;
-  top: 65px;
+  width: 740px;
+  margin: auto;
 }
 
 #noble-area {
-  height: 140px;
-  width: 100%;
-  margin-bottom: 10px;
-  zoom: 0.8;
-  -moz-transform: scale(0.8);
+  width: 100px;
 }
 
 #noble-area .noble {
   cursor: pointer;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  font-size: 10px;
 }
 
 #level-area {
   height: 540px;
   width: 640px;
-  float: left;
 }
 
 #gem-area {
-  height: 540px;
-  width: 84px;
-  float: left;
+  width: 640px;
+  height: 84px;
+  margin: auto;
+}
+
+#gem-area .gem {
+  height: 76px;
+  width: 76px;
 }
 
 #player-area {
   height: 680px;
-  width: 480px;
-  position: absolute;
-  right: 5px;
-  top: 65px;
+  width: 740px;
+  margin: auto;
+  vertical-align: top;
+}
+
+@media screen and (orientation:portrait) {
+  #game-board {
+    transform: scale(1.6);
+    -ms-transform: scale(1.6);
+    position: relative;
+    top: 410px;
+  }
+}
+
+@media screen and (orientation:landscape) {
+  #common-area, #player-area {
+    display: inline-block;
+  }
+
+  #player-area {
+    width: 500px;
+  }
+
+  #game-board {
+    width: 1240px;
+  }
 }
 
 .spectate-button {
@@ -177,33 +203,112 @@ button, .inputButton {
 }
 
 .noble {
-  float: left;
-  margin-right: 12px;
-  width: 130px;
-  height: 130px;
   border: 1px solid white;
-  box-shadow: 8px 8px 10px #dedede;
-  border-radius: 8px;
+  box-shadow: 4px 4px 5px #dedede;
+  border-radius: 6.2%;
   background-color: #eeeeee;
+  background-size: 1000% 100%;
+  background-image: url('img/nobles.jpg')
+}
+
+#noble0 {
+  background-position: 0 0;
+}
+
+#noble1 {
+  background-position: 11.1% 0;
+}
+
+#noble2 {
+  background-position: 22.2% 0;
+}
+
+#noble3 {
+  background-position: 33.3% 0;
+}
+
+#noble4 {
+  background-position: 44.4% 0;
+}
+
+#noble5 {
+  background-position: 55.5% 0;
+}
+
+#noble6 {
+  background-position: 66.6% 0;
+}
+
+#noble7 {
+  background-position: 77.7% 0;
+}
+
+#noble8 {
+  background-position: 88.8% 0;
+}
+
+#noble9 {
+  background-position: 100% 0;
+}
+
+.card {
+  background-image: url('img/cards.jpg');
+  background-size: 1500% 100%;
 }
 
 .card, .deck {
-  float: left;
-  margin-right: 10px;
+  display: inline-block;
   margin-bottom: 22px;
-  width: 115px;
-  height: 160px;
-  border-radius: 7px;
   position: relative;
   border: 1px solid white;
+  border-radius: 6%;
+}
+
+#common-area .card, #common-area .deck {
   box-shadow: 4px 4px 4px #ccc;
+  width: 115px;
+  height: 160px;
+  font-size: 15px;
+  margin-right: 10px;
+}
+
+#common-area .card, .reserveArea .card {
+  cursor: pointer;
+}
+
+.reserveArea .deck, .reserveArea .card {
+  box-shadow: 3px 3px 3px #ccc;
+  width: 85px;
+  height: 118px;
+  font-size: 11px;
+  margin-right: 10px;
+}
+
+.player .cards .card {
+  box-shadow: 3px 3px 3px #ccc;
+  width: 75px;
+  height: 105px;
+  font-size: 11px;
+}
+
+.cards, .nobles {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.cards {
+  margin-right: 5px;
+}
+
+.player .noble {
+  width: 65px;
+  height: 65px;
+  font-size: 8px;
+  margin-bottom: 10px;
 }
 
 .overlay {
   display: none;
-  transition: opacity .25s ease-in-out;
-  -moz-transition: opacity .25s ease-in-out;
-  -webkit-transition: opacity .25s ease-in-out;
 }
 
 #common-area .card:hover .overlay, .deck:hover .overlay, .reserveArea .card:hover .overlay {
@@ -217,51 +322,34 @@ button, .inputButton {
   display: block;
 }
 
-.act:hover {
+.reserve:hover {
   background-color: rgba(255, 255, 255, 0.7);
 }
 
-.act {
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.buy {
-  font-size: 28px;
-  text-align: center;
-  margin-top: 65px;
-  margin-left: 41px;
-  width: 29px;
-  height: 29px;
-  border: 3px solid white;
-  position: relative;
-}
-
-.plus {
-  position: absolute;
-  font-family: "Arial Black", Gadget, sans-serif;
-  font-style: normal;
-  -webkit-text-stroke-width: 0;
-  font-weight: normal;
-  top: -6px;
-  left: 5px;
-}
-
-.reserve {
+#common-area .reserve {
   position: absolute;
   bottom: 20px;
   left: 42px;
   height: 33px;
   width: 33px;
+  z-index: 3;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.player .reserve {
+  display: none;
 }
 
 .reserveCards {
-  float: left;
-  width: 295px;
-  height: 125px;
+  vertical-align: top;
+  display: inline-block;
+  width: 291px;
+  height: 120px;
   border-radius: 5px;
-  padding: 10px;
-  padding-left: 20px;
+  padding: 7px;
+  padding-left: 10px;
+  padding-right: 2px;
   border: 2px solid black;
   -webkit-box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.2);
   -moz-box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.2);
@@ -282,195 +370,233 @@ button, .inputButton {
 }
 
 .colorSet {
-  float: left;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .colorSet .card {
-  float: none;
+  display: block;
 }
 
 .colorSetInner {
-  height:30px;
+  height: 28px;
   overflow: visible;
 }
 
-.spacer, .smallspacer {
-  width: 115px;
-  margin-right: 13px;
-  margin-bottom: 40px;
+.spacer, .endcap {
+  width: 80px;
+  margin-right: 5px;
+}
+
+.endcap {
+  height: 80px;
 }
 
 .spacer {
-  height: 120px;
-}
-
-.smallspacer {
   height: 1px;
 }
 
 .floater {
-  width: 400px;
-  float: left;
+  width: 500px;
 }
 
-.nobles {
-  float: left;
+.statSet {
+  display: inline-block;
+  margin-left: 20px;
 }
 
-.player .noble {
-  float: none;
-  margin-bottom: 10px;
-  zoom: 0.5;
-  -moz-transform: scale(0.5);
+.stat {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 3px;
+  border: 2px solid black;
 }
 
-.colorSetInner, .spacer, .smallspacer {
-  zoom: 0.5;
-  -moz-transform: scale(0.5);
+.staty {
+  background-color: yellow;
+}
+
+.statr {
+  background-color: #c90808;
+}
+
+.statb {
+  background-color: black;
+}
+
+.statg {
+  background-color: #0f8e13;
+}
+
+.statw {
+  background-color: white;
+}
+
+.statu {
+  background-color: #0e59ba;
+}
+
+.labelImg {
+  height: 20px;
+  position: relative;
+  top: 15px;
+}
+
+.reservedStat {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 15px;
+  position: relative;
+  top: 10px;
+}
+
+.reservedStat .level1, .reservedStat .card-level1 {
+  background-color: #109e0e;
+}
+
+.reservedStat .level2, .reservedStat .card-level2 {
+  background-color: #f2ba1f;
+}
+
+.reservedStat .level3, .reservedStat .card-level3 {
+  background-color: #0f5bad;
+}
+
+.reservedStat .card, .reservedStat .deck {
+  height: 20px;
+  width: 14px;
+  margin-left: 4px;
+  border: 2px solid black;
+  background-image: none;
+  border-radius: 15%;
+}
+
+.reservedStat .card .overlay, .reservedStat .card .header, .reservedStat .card .cost {
+  display: none;
+}
+
+.stats {
+  margin-left: 10px;
+  -webkit-text-fill-color: black;
+}
+
+.split {
+  display: inline-block;
+  vertical-align: top;
 }
 
 .reserveText {
+  display: inline-block;
   padding-left: 10px;
   -ms-transform: rotate(90deg);
-  -webkit-transform: rotate(90deg);
   transform: rotate(90deg);
   width: 20px;
   height: 20px;
   -webkit-text-fill-color: black;
-  float: left;
 }
 
 .reserveArea {
   margin-top: 20px;
 }
 
-.reserveArea .card, .reserveArea .deck {
-  zoom: 0.75;
-  -moz-transform: scale(0.75);
-}
-
 .card-r.card-level1 {
-  background-image: url('img/volcano.jpg');
-  background-size: 284px 160px;
-  background-position: center;
+  background-position: 85.71% 0;
 }
 
 .card-r.card-level2 {
-  background-image: url('img/dealer.jpg');
-  background-size: 187px 160px;
-  background-position: center;
+  background-position: 92.86% 0;
 }
 
 .card-r.card-level3 {
-  background-image: url('img/fantasy.png');
-  background-size: 205px 160px;
-  background-position: center;
+  background-position: 100% 0;
 }
 
 .card-g.card-level1 {
-  background-image: url('img/forest.jpg');
-  background-size: 284px 160px;
-  background-position: center;
+  background-position: 64.29% 0;
 }
 
 .card-g.card-level2 {
-  background-image: url('img/ship.jpg');
-  background-size: 284px 160px;
-  background-position: center;
+  background-position: 71.43% 0;
 }
 
 .card-g.card-level3 {
-  background-image: url('img/palace.jpg');
-  background-size: 279px 160px;
-  background-position: center;
+  background-position: 78.57% 0;
 }
 
 .card-b.card-level1 {
-  background-image: url('img/desert.jpg');
-  background-size: 334px 160px;
-  background-position: center;
+  background-size: 3000% 200%;
+  background-position: 0 0;
 }
 
 .card-b.card-level2 {
-  background-image: url('img/desert.jpg');
-  background-size: 334px 160px;
-  background-position: center;
+  background-position: 7.143% 0;
 }
 
 .card-b.card-level3 {
-  background-image: url('img/village.png');
-  background-size: 334px 160px;
-  background-position: center;
+  background-position: 14.29% 0;
 }
 
 .card-w.card-level1 {
-  background-image: url('img/mountain.jpg');
-  background-size: 284px 160px;
-  background-position: center;
+  background-position: 42.86% 0;
 }
 
 .card-w.card-level2 {
-  background-image: url('img/merchant.jpg');
-  background-size: 138px 160px;
-  background-position: center;
+  background-position: 50% 0;
 }
 
 .card-w.card-level3 {
-  background-image: url('img/fortress.jpg');
-  background-size: 284px 160px;
-  background-position: left;
+  background-position: 57.14% 0;
 }
 
 .card-u.card-level1 {
-  background-image: url('img/pond.jpg');
-  background-size: 284px 160px;
-  background-position: center;
+  background-position: 21.43% 0;
 }
 
 .card-u.card-level2 {
-  background-image: url('img/island.jpg');
-  background-size: 213px 160px;
-  background-position: center;
+  background-position: 28.57% 0;
 }
 
 .card-u.card-level3 {
-  background-image: url('img/island.jpg');
-  background-size: 213px 160px;
-  background-position: center;
+  background-position: 35.71% 0;
 }
 
 .color {
-  width: 30px;
-  height: 30px;
+  width: 32.1%;
+  height: 68.4%;
   position: absolute;
-  right: 8px;
-  top: 6px;
-  background-size: 30px 30px;
+  right: 7%;
+  top: 14.2%;
   background-repeat: no-repeat;
+  background-size: 500% 100%;
+  background-image: url('img/gems.png')
 }
 
 .side-bar {
-  width: 30px;
-  height: 128px;
-  padding-left: 3px;
-  padding-top: 2px;
-  background-color: snow;
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
+  width: 23.1%;
+  height: 98.5%;
+  padding-left: 2.25%;
+  padding-top: 1.5%;
+  background-color: rgba(255,255,255,0.7);
+  border-top-left-radius: 4.6%;
+  border-bottom-left-radius: 4.6%;
 }
 
 .points {
-  padding-left: 4px;
-  font-size: 30px;
-  margin-bottom: 8px;
+  padding-left: 10%;
+  font-size: 200%;
+  height: 28%;
+  margin-bottom: 30%;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: #777;
 }
 
 .header {
-  height: 44px;
-  width: 110px;
-  padding-left: 5px;
+  height: 27.5%;
+  width: 98.2%;
+  padding-left: 2%;
   top: 0px;
   position: absolute;
   border-top-left-radius: 6px;
@@ -483,18 +609,24 @@ button, .inputButton {
   border-top-right-radius: 2px;
 }
 
+.requirement {
+  height: 75%;
+  width: 100%;
+}
+
 .requires {
-  font-size: 14px;
-  width: 8px;
-  height: 20px;
-  padding: 1px 4px 1px 4px;
-  margin-left: 3px;
-  border-radius: 3px;
+  font-size: 100%;
+  width: 28.7%;
+  height: 20.5%;
+  padding: 4% 14% 4% 14%;
+  margin-left: 10%;
+  border-radius: 14%;
   border: 1px solid white;
-  margin-bottom: 2px;
+  margin-bottom: 2%;
 }
 
 .remaining {
+  position: absolute;
   border-top-right-radius: 50%;
   border-bottom-right-radius: 50%;
   border-bottom-left-radius: 50%;
@@ -509,14 +641,20 @@ button, .inputButton {
 
 .costs {
   text-align: center;
-  padding-left: 5px;
-  bottom:4px;
+  width: 19.1%;
+  height: 60%;
+  padding-left: 4.3%;
+  bottom: 4.3%;
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .cost {
-  width: 22px;
-  height: 22px;
+  width: 85%;
+  height: 20%;
+  font-size: 110%;
   border-radius: 50%;
   border: 2px solid white;
   margin-bottom: 1px;
@@ -553,13 +691,13 @@ button, .inputButton {
 }
 
 .gem {
-  background-size: 76px 76px;
-  width: 76px;
-  height: 76px;
+  margin-top: 2%;
+  background-size: 100% 100%;
   border-radius: 50%;
-  margin-bottom: 7px;
+  margin-right: 4.3%;
   box-shadow: 4px 4px 4px #c2c2c2;
   position: relative;
+  display: inline-block;
 }
 
 #common-area .schip .underlay {
@@ -572,40 +710,19 @@ button, .inputButton {
 
 .you .gem .underlay {
   position: absolute;
-  width: 76px;
-  height: 74px;
-  padding-top: 2px;
+  width: 100%;
+  height: 100%;
   text-align: center;
   -webkit-text-stroke-color: white;
   -webkit-text-stroke-width: 0;
   font-family: "Arial Black", Gadget, sans-serif;
   font-style: normal;
-  font-size: 50px;
+  font-size: 300%;
   cursor: pointer;
 }
 
 .gem .underlay {
   display: none;
-}
-
-#log-toggle, #chat-toggle {
-  position: fixed;
-  bottom: 5px;
-  color: #d0d0d0;
-  font-style: normal;
-  text-shadow: -1px -1px 0px #bbb;
-  -webkit-text-fill-color: #d5d5d5;
-  -webkit-text-stroke-width: 0;
-  opacity: 0.5;
-  z-index: -1;
-}
-
-#log-toggle {
-  left: 260px;
-}
-
-#chat-toggle {
-  right: 50px;
 }
 
 #log-box, #chat-box {
@@ -636,24 +753,6 @@ button, .inputButton {
   width: 250px;
   height: 300px;
   right: 20px;
-}
-
-#drake {
-  position: fixed;
-  bottom: 36px;
-  border-bottom: 2px solid black;
-  border-top: 2px solid black;
-  border-right: 2px solid black;
-  width: 80px;
-  height: 80px;
-  overflow: hidden;
-  -webkit-transition: width 0.3s; /* Safari */
-  transition: width 0.3s;
-  left: 0;
-}
-
-#drake:hover {
-  width: 300px;
 }
 
 #chat {
@@ -719,10 +818,16 @@ button, .inputButton {
 }
 
 .player .gem {
-  zoom: 0.7;
-  -moz-transform: scale(0.7);
-  margin-right: 18px;
-  float: left;
+  width: 65px;
+  height: 65px;
+  font-size: 14px;
+  margin-right: 10px;
+  margin-left: 10px;
+  display: inline-block;
+}
+
+.gems {
+  width: 520px;
 }
 
 .player {
@@ -730,90 +835,88 @@ button, .inputButton {
 }
 
 .uchip {
-  background-image: url('img/ugem.png');
+  background: url('img/chips.jpg') 20% 0;
+  background-size: 600% 100%;
 }
 
 .bchip {
-  background-image: url('img/bgem.png');
+  background: url('img/chips.jpg') 0 0;
+  background-size: 600% 100%;
 }
 
 .rchip {
-  background-image: url('img/rgem.png');
+  background: url('img/chips.jpg') 80% 0;
+  background-size: 600% 100%;
 }
 
 .gchip {
-  background-image: url('img/ggem.png');
+  background: url('img/chips.jpg') 60% 0;
+  background-size: 600% 100%;
 }
 
 .wchip {
-  background-image: url('img/wgem.png');
+  background: url('img/chips.jpg') 40% 0;
+  background-size: 600% 100%;
 }
 
 .schip {
-  background-image: url('img/sgem.png');
-}
-
-.player .bubble {
-  width: 30px;
-  height: 30px;
-  font-size: 22px;
-  top: -8px;
-  left: -8px;
+  background: url('img/chips.jpg') 100% 0;
+  background-size: 600% 100%;
 }
 
 .bubble {
   border-radius: 50%;
   border: 3px solid white;
-  width: 22px;
-  height: 22px;
+  font-size: 110%;
+  width: 30%;
+  height: 30%;
   text-align: center;
   background-color: black;
   position: absolute;
+  left: -3%;
+  top: -3%;
   z-index: 2;
 }
 
 .wgem {
-  top: 9px;
-  background-image: url('img/diamond.png');
+  background-position: 50% 0;
 }
 
 .ggem {
-  background-image: url('img/emerald.png');
+  background-position: 75% 0;
 }
 
 .rgem {
-  background-image: url('img/ruby.png');
+  background-position: 100% 0;
 }
 
 .bgem {
-  background-image: url('img/chocolate.png');
+  background-position: 0 0;
 }
 
 .ugem {
-  background-image: url('img/sapphire.png');
+  background-position: 25% 0;
 }
 
 .deck {
-  background-color: white;
-  background-size: 109px 154px;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-size: 300% 100%;
+  background-image: url('img/deck.jpg');
+}
+
+.face-up-cards {
+  display: inline-block;
 }
 
 .level1 {
-  background-image: url('img/level1.png');
+  background-position: 0 0;
 }
 
 .level2 {
-  background-image: url('img/level2.png');
+  background-position: 50% 0;
 }
 
 .level3 {
-  background-image: url('img/level3.png');
-}
-
-.breaker {
-  clear: both;
+  background-position: 100% 0;
 }
 
 #game-title {
