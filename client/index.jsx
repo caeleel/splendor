@@ -97,28 +97,26 @@
   });
 
   var Card = React.createClass({
-
     render: function() {
       var self = this;
       var card = self.props.card;
       var game = self.props.game;
       var buyer = game.buy.bind(game, card.uuid);;
-      var reserver = game.reserve.bind(game, card.uuid);
+      var reserver = function(e) {
+        e.preventDefault();
+        game.reserve.bind(game)(card.uuid);
+      }
 
       if (card.color) {
         return (
           <div
-            className = {"card card-" + card.color + " card-" + card.level}
-            id = {card.uuid}
+            className={"card card-" + card.color + " card-" + card.level}
+            id={card.uuid}
           >
-            <div className="overlay">
-              <div className="act buy" onClick={buyer}>
-                <div className="plus">+</div>
-              </div>
-              <div className="act reserve" onClick={reserver}>
-                <img className="floppy" src="client/img/floppy.png" />
-              </div>
+            <div className="reserve" onClick={reserver}>
+              <img className="floppy" src="client/img/floppy.png" />
             </div>
+            <div className="overlay" onClick={buyer}></div>
             <div className="underlay">
               <div className="header">
                 <div className={"color " + card.color + "gem"}>
@@ -159,7 +157,7 @@
       var visit = game.noble.bind(game, noble.uuid);
 
       return (
-        <div className="noble" onClick={visit} id={noble.uuid}>
+        <div className="noble" onClick={visit} id={"noble" + noble.id}>
           <div className="side-bar">
             <div className="points">
               {noble.points > 0 && noble.points}
@@ -188,11 +186,20 @@
     render: function() {
       var self = this;
       var game = self.props.game;
+      var pid = self.props.pid;
+      var playerSelector = game.selectPlayer.bind(game, pid);
+      var collection = {}
+
+      gemColors.map(function(color) {
+        collection[color] = {'cards': 0, 'gems': self.props.gems[color]};
+      });
+
       var set = colors.map(function(color) {
         var cards = self.props.cards[color].map(function (card) {
+          collection[color]['cards'] += 1;
           return (
             <div
-              key={self.props.pid + "_card_" + card.uuid}
+              key={pid + "_card_" + card.uuid}
               className="colorSetInner"
             >
               <Card key={card.uuid} card={card} game={game}/>
@@ -200,15 +207,25 @@
           );
         });
         return (
-          <div key={self.props.pid + "_set_" + color} className="colorSet">
+          <div key={pid + "_set_" + color} className="colorSet">
             {cards}
-            <div className={cards.length > 0 ? "spacer" : "smallspacer"}></div>
+            <div className={cards.length > 0 ? "endcap" : "spacer"}></div>
           </div>
         );
       });
-      var you = (game.props.pid == self.props.pid ? " you" : "");
-      var youName = (game.props.pid == self.props.pid ? " (you)" : "");
-      var gems = mapColors(self.props.gems, game, game.discard, 'X', self.props.pid);
+
+      var stats = gemColors.map(function(color) {
+        return (
+          <div className="statSet" key={"stat" + color}>
+            <div>{collection[color]['gems'] + (color == '*' ? '' : ' / ' + collection[color]['cards'])}</div>
+            <div className={"stat stat" + (color == '*' ? 'y' : color)}></div>
+          </div>
+        );
+      });
+
+      var you = (game.props.pid == pid ? " you selected" : "");
+      var youName = (game.props.pid == pid ? " (you)" : "");
+      var gems = mapColors(self.props.gems, game, game.discard, 'X', pid);
       var reserved = [];
       var reservedCount = 0;
       if (self.props.reserved) {
@@ -222,38 +239,46 @@
         reservedCount = self.props.nreserved;
       }
       var nobles = mapNobles(self.props.nobles, game);
+
       return (
         <div className={"player" + you}>
-          {game.state.turn == self.props.pid &&
-            <div className="turnIndicator">&#9654;</div>
+          {game.state.turn == pid &&
+            <div className="turnIndicator">&gt;</div>
           }
-          <div className="playerName">{self.props.name + youName}</div>
+          <div className="playerName" onClick={playerSelector}>{self.props.name + youName}</div>
           <div className="playerPoints">{self.props.points}</div>
-          <div className="floater">
-            <div className="cards-wrapper">
+          {game.state.selectedPlayer == pid ?
+            <div className="floater">
               <div className="cards">
                 {set}
               </div>
-            </div>
-            <div className="gems">
-              {gems}
-            </div>
-            <div className="reserveArea">
-              { reservedCount > 0 &&
-                <div>
-                  <div className="reserveText">
-                    reserved
+              <div className="nobles">
+                {nobles}
+              </div>
+              <div className="gems">
+                {gems}
+              </div>
+              <div className="reserveArea">
+                { reservedCount > 0 &&
+                  <div>
+                    <div className="reserveText">
+                      reserved
+                    </div>
+                    <div className="reserveCards">
+                      {reserved}
+                    </div>
                   </div>
-                  <div className="reserveCards">
-                    {reserved}
-                  </div>
-                </div>
-              }
+                }
+              </div>
+            </div> :
+            <div className="stats">
+              <img className="labelImg" src="client/img/labels.png" />
+              {stats}
+              <div className="reservedStat">
+                {reserved}
+              </div>
             </div>
-          </div>
-          <div className="nobles">
-            {nobles}
-          </div>
+          }
         </div>
       );
     }
@@ -278,10 +303,9 @@
             <div className="remaining">
               {self.props.remaining}
             </div>
-            <div className="overlay">
-              <div className="act reserve" onClick={game.reserve.bind(game, self.props.name)}>
-                <img className="floppy" src="client/img/floppy.png" />
-              </div>
+            <div className="overlay"></div>
+            <div className="reserve" onClick={game.reserve.bind(game, self.props.name)}>
+              <img className="floppy" src="client/img/floppy.png" />
             </div>
           </div>
           <div className={"c_" + self.props.name + " face-up-cards"}>
@@ -305,6 +329,7 @@
         nobles: [],
         log: [],
         turn: -1,
+        selectedPlayer: -1,
         phase: "pregame",
       };
     },
@@ -323,6 +348,10 @@
             document.getElementById("notify").play();
           }
           this.setState({mode: "normal"});
+        }
+
+        if (this.state.selectedPlayer == -1) {
+          this.setState({selectedPlayer: this.props.pid});
         }
 
         this.setState({
@@ -374,6 +403,10 @@
       if (confirm("Are you sure you want to discard a gem?")) {
         this.act('discard', color);
       }
+    },
+
+    selectPlayer: function(player) {
+      this.setState({selectedPlayer: player});
     },
 
     buy: function(uuid) {
@@ -472,7 +505,7 @@
           />
         );
       });
-      var gems = mapColors(self.state.gems, self, self.take, '+', 'game');
+      var gems = mapColors(self.state.gems, self, self.take, '', 'game');
       var nobles = mapNobles(self.state.nobles, self);
       var log = self.state.log.map(function(logLine, i) {
         return (
@@ -505,15 +538,11 @@
         <div>
           <div id="game-board">
             <div id="common-area">
-              <div className="split">
-                <div id="level-area">
-                  {levels}
-                </div>
+              <div id="level-area" className="split">
+                {levels}
               </div>
-              <div className="split">
-                <div id="noble-area">
-                  {nobles}
-                </div>
+              <div id="noble-area" className="split">
+                {nobles}
               </div>
               <div id="gem-area" className="you">
                 {gems}
@@ -540,8 +569,6 @@
             </div>
           </div>
           <div id="pass-turn" onClick={self.nextTurn}>Pass turn</div>
-          <div id="log-toggle">Press 'L' to toggle log</div>
-          <div id="chat-toggle">Press 'C' to toggle chat</div>
           <div id="error-box"><div id="error-box-inner"></div></div>
         </div>
       );
@@ -649,7 +676,7 @@
             <div id="game-title">
               <span id="game-title-span">{this.state.title}</span>
               <button id="leave-game" onClick={this.leaveGame}>Leave</button>
-              { this.state.startKey &&
+              { this.state.startKey && this.state.pid == 0 &&
                 <button id="start-game" onClick={this.startGame}>Start</button>
               }
             </div>
