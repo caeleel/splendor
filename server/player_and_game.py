@@ -478,8 +478,11 @@ class Game(object):
                 self.gems[c] = 7
         return (player.id, player.uuid)
 
-    def add_spectator(self, name):
-        player = Player(self, self.spectator_index, name)
+    def rename_player(self, pid, name):
+        self.players[pid].name = name
+
+    def add_spectator(self):
+        player = Player(self, self.spectator_index, "Player {}".format(self.spectator_index + 1))
         self.pids.append(player.id)
         self.players.append(player)
         self.spectator_index += 1

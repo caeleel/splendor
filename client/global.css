@@ -1,14 +1,108 @@
 body {
-  font-style: italic;
   font-weight: bold;
   font-family: Georgia, cursive;
-  background: #EEE;
+  background: #FCF6EE;
   padding: 0;
   margin: 0;
   width: 100%;
 }
 
-button, .inputButton {
+a {
+  color: #222;
+  font-weight: bold;
+}
+
+.lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.main-title {
+  font-style: italic;
+  margin-top: 100px;
+  margin-bottom: 20px;
+  font-size: 36px;
+}
+
+.desc {
+  font-weight: 100;
+  width: 500px;
+  margin-top: 40px;
+}
+
+.link {
+  font-size: 14px;
+  font-weight: 100;
+}
+
+.name {
+  margin-top: 40px;
+}
+
+.name0 {
+  color: #2F80ED;
+}
+
+.name1 {
+  color: #219653;
+}
+
+.name2 {
+  color: #EB5757;
+}
+
+.name3 {
+  color: #F2994A;
+}
+
+.name4 {
+  color: #F2C94C;
+}
+
+.name5 {
+  color: #9B51E0;
+}
+
+.name6 {
+  color: #828282;
+}
+
+.name7 {
+  color: #333;
+}
+
+.name8 {
+  color: #56CCF2;
+}
+
+.game-name {
+  width: 250px;
+  padding-left: 6px;
+  border: 2px solid #222;
+  height: 31px;
+  border-radius: 4px 0 0 4px;
+}
+
+.create-game {
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  position: relative;
+  top: 1px;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+button:hover {
+  background-color: #dedede;
+}
+
+button {
   font-style: italic;
   font-weight: bold;
   font-family: Georgia, cursive;
@@ -21,74 +115,32 @@ button, .inputButton {
   font-size: 15px;
 }
 
-.info-button {
-  margin-left: 10px;
-  margin-right: 0;
-  border: 1px solid black;
-  font-size: 12px;
-  padding: 1px 4px 1px 4px;
-}
-
-#status-window {
+.error-box {
   position: fixed;
-  left: 0;
-  bottom: 0;
-  border-right: 2px solid black;
-  height: 130px;
-  width: 52px;
+  bottom: 20px;
+  color: white;
   text-align: center;
-  letter-spacing: 1px;
-  overflow: hidden;
-  background-color: white;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease-in-out;
+  width: 100%;
 }
 
-.status-box {
-  font-size: 13px;
-  height: 22px;
-  width: 36px;
-  border-bottom: 2px solid black;
-  padding: 7px 8px 2px 8px;
-}
-
-.status-label {
-  font-weight: bold;
-}
-
-#error-box {
-  display: none;
-}
-
-#info-box, #error-box {
-  left: 30%;
-  width: 40%;
-  position: fixed;
-  bottom: 0;
-  border-top: 2px solid black;
-  border-left: 2px solid black;
-  border-right: 2px solid black;
-  height: 30px;
-  background-color: white;
-}
-
-#error-box-inner {
-  background-color: #E61919;
-}
-
-#error-box-inner, #info-box-inner {
-  margin-left: 10px;
-  margin-right: 10px;
-  border-left: 2px solid black;
-  border-right: 2px solid black;
-  padding: 8px;
-  height: 14px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 12px;
+.error-box-inner {
+  font-family: "Roboto";
+  font-weight: 100;
+  height: 20px;
+  padding: 4px 20px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.6);
+  box-shadow: 0px 4px 5px #dedede;
 }
 
 #game-board {
   margin: auto;
-  width: 740px;
+  width: 670px;
+  font-style: italic;
   -webkit-text-fill-color: white;
   -webkit-text-stroke-width: 0.5px;
   -webkit-text-stroke-color: black;
@@ -96,8 +148,8 @@ button, .inputButton {
 
 #pass-turn {
   position: fixed;
-  bottom: 0;
-  left: 0;
+  top: 7px;
+  right: 0px;
   padding: 4px 15px 4px 15px;
   cursor: pointer;
   background-color: white;
@@ -105,16 +157,21 @@ button, .inputButton {
   border-top: 2px solid black;
 }
 
-.playerName, .turnIndicator{
+.playerName, .turnIndicator {
   -webkit-text-fill-color: black;
-  margin-bottom: 15px;
   font-size: 20px;
-  display: inline-block;
   cursor: pointer;
+}
+
+.playerName2 {
+  -webkit-text-fill-color: black;
+  margin-left: 8px;
+  font-size: 20px;
 }
 
 .turnIndicator {
   width: 20px;
+  margin-left: 10px;
   font-style: normal;
 }
 
@@ -126,26 +183,28 @@ button, .inputButton {
   text-align: center;
   background-color: black;
   font-size: 20px;
-  margin-left: 10px;
+  margin-right: 10px;
   border-radius: 3px;
   -webkit-text-stroke-width: 0;
 }
 
 #common-area {
-  height: 680px;
-  width: 740px;
+  height: 740px;
+  width: 670px;
   margin: auto;
 }
 
 #noble-area {
-  width: 100px;
+  width: 640px;
+  display: flex;
+  justify-content: center;
 }
 
 #noble-area .noble {
   cursor: pointer;
   width: 80px;
   height: 80px;
-  margin-bottom: 20px;
+  margin: 20px 10px;
   font-size: 10px;
 }
 
@@ -157,7 +216,8 @@ button, .inputButton {
 #gem-area {
   width: 640px;
   height: 84px;
-  margin: auto;
+  display: flex;
+  justify-content: space-around;
 }
 
 #gem-area .gem {
@@ -168,16 +228,29 @@ button, .inputButton {
 #player-area {
   height: 680px;
   width: 740px;
-  margin: auto;
+  margin-top: 120px;
   vertical-align: top;
+}
+
+.reserve-info {
+  width: 640px;
+  height: 40px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reserve-info .reserve-info-inner {
+  display: flex;
+  align-items: center;
+  -webkit-text-fill-color: black;
+  -webkit-text-stroke-width: 0;
 }
 
 @media screen and (orientation:portrait) {
   #game-board {
-    transform: scale(1.6);
-    -ms-transform: scale(1.6);
     position: relative;
-    top: 410px;
   }
 }
 
@@ -191,15 +264,8 @@ button, .inputButton {
   }
 
   #game-board {
-    width: 1240px;
+    width: 1170px;
   }
-}
-
-.spectate-button {
-  margin-left: 10px;
-  cursor: pointer;
-  font-style: normal;
-  font-size: 15px;
 }
 
 .noble {
@@ -365,6 +431,10 @@ button, .inputButton {
   height: 33px;
 }
 
+.reserve-info .floppy {
+  margin: 0 4px;
+}
+
 .card .underlay {
   z-index: 1;
 }
@@ -401,18 +471,20 @@ button, .inputButton {
 }
 
 .statSet {
-  display: inline-block;
-  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 10px;
+  width: 65px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .stat {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 3px;
-  border: 2px solid black;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  border: 2px solid #333;
 }
 
 .staty {
@@ -420,15 +492,16 @@ button, .inputButton {
 }
 
 .statr {
-  background-color: #c90808;
+  background-color: #E02727;
 }
 
 .statb {
   background-color: black;
+  -webkit-text-fill-color: white;
 }
 
 .statg {
-  background-color: #0f8e13;
+  background-color: #25D770;
 }
 
 .statw {
@@ -436,13 +509,11 @@ button, .inputButton {
 }
 
 .statu {
-  background-color: #0e59ba;
+  background-color: #4ACEF9;
 }
 
 .labelImg {
   height: 20px;
-  position: relative;
-  top: 15px;
 }
 
 .reservedStat {
@@ -479,8 +550,13 @@ button, .inputButton {
 }
 
 .stats {
-  margin-left: 10px;
+  display: flex;
+  width: 600px;
   -webkit-text-fill-color: black;
+}
+
+.gem-stats {
+  display: flex;
 }
 
 .split {
@@ -694,7 +770,6 @@ button, .inputButton {
   margin-top: 2%;
   background-size: 100% 100%;
   border-radius: 50%;
-  margin-right: 4.3%;
   box-shadow: 4px 4px 4px #c2c2c2;
   position: relative;
   display: inline-block;
@@ -734,25 +809,34 @@ button, .inputButton {
   padding-top: 30px;
   padding-bottom: 10px;
   position: fixed;
-  bottom: -4px;
   border: 2px solid black;
   border-bottom: none;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
-  display: none;
   z-index: 3;
 }
 
 #log-box {
   width: 500px;
   height: 500px;
-  left: 110px;
+  right: 280px;
 }
 
 #chat-box {
   width: 250px;
   height: 300px;
   right: 20px;
+}
+
+.blinking {
+  animation:blinkingFill 3s infinite;
+}
+@keyframes blinkingFill {
+  0%{     background-color: #25D770;    }
+  49%{    background-color: #25D770; }
+  60%{    background-color: white; }
+  99%{    background-color: white;  }
+  100%{   background-color: #25D770;    }
 }
 
 #chat {
@@ -800,6 +884,7 @@ button, .inputButton {
   position: absolute;
   top: 0;
   left: 0;
+  cursor: pointer;
   padding: 3px 10px 3px 10px;
   border-bottom: 1px solid black;
   margin-bottom: 5px;
@@ -817,6 +902,18 @@ button, .inputButton {
   padding: 2px 10px 0px 10px;
 }
 
+.pencil {
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.nameInput {
+  border: 1px solid #333;
+  box-sizing: border-box;
+  height: 26px;
+  padding-left: 4px;
+}
+
 .player .gem {
   width: 65px;
   height: 65px;
@@ -824,6 +921,12 @@ button, .inputButton {
   margin-right: 10px;
   margin-left: 10px;
   display: inline-block;
+}
+
+.playerHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .gems {
@@ -920,67 +1023,13 @@ button, .inputButton {
 }
 
 #game-title {
-  margin-top: 10px;
-  margin-bottom: 15px;
   border-bottom: 2px solid black;
   width: 100%;
-  font-weight: bold;
+  box-sizing: border-box;
   font-size: 24px;
-  height: 37px;
-}
-
-#game-title-span {
-  padding-left: 15px;
-}
-
-#leave-game, #start-game {
-  float: right;
-}
-
-#games-list {
-  float: left;
-  width: 70%;
-}
-
-#game-manager {
-  margin: 40px;
-}
-
-#games-list ul li span.game-title {
-  cursor: pointer;
-  font-weight: bold;
-  color: #750000;
-}
-
-#games-list ul li .game-playerCount{
-  font-weight: lighter;
-  color: #AAA;
-  font-size: .8em;
-}
-
-#create-game {
-  float: left;
-  width: 30%;
-}
-
-#create-game input[type=text] {
-  font-size: 1.2em;
-  padding: 0.25em;
-  margin: 0.25em 0;
-  font-family: Georgia, serif;
-  font-style: italic;
-  border-radius: 3px;
-}
-
-#create-game input[type=submit] {
-  border-radius: 0.5em;
-  background-color: white;
-  border: 2px solid black;
-  padding: 1em;
-  color: black;
-  margin-top: 1em;
-}
-
-.game-title {
-  padding-right: 5px;
+  padding: 10px 0 10px 10px;
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
 }

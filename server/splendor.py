@@ -1,36 +1,16 @@
 from flask import Flask, Response, request, send_from_directory
 from functools import wraps
 from player_and_game import *
-import uuid
+import random
 import time
 import json
 import os
 
 app = Flask(__name__)
 game_map = {}
-POLL_INTERVAL = 2
-client_dir = os.path.join(os.path.dirname(os.getcwd()), 'client')
-
-def check_auth(username, password):
-    """This function is called to check if a username /
-    password combination is valid.
-    """
-    return username == 'shrek' and password == 'islove'
-
-def authenticate():
-    """Sends a 401 response that enables basic auth"""
-    return Response(
-    'Bark', 401,
-    {'WWW-Authenticate': 'Basic realm="Meow"'})
-
-def requires_auth(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
-            return authenticate()
-        return f(*args, **kwargs)
-    return decorated
+POLL_INTERVAL = 0.1
+client_dir = os.path.join(os.getcwd(), 'client')
+words = []
 
 def json_response(f):
     @wraps(f)
@@ -40,10 +20,10 @@ def json_response(f):
     return decorated_function
 
 class GameManager(object):
-    def __init__(self, title):
+    def __init__(self, name):
         global game_map
 
-        self.uuid = uuid.uuid4().hex
+        self.uuid = name
         self.starter = uuid.uuid4().hex
         game_map[self.uuid] = self
         self.game = Game()
@@ -52,11 +32,9 @@ class GameManager(object):
         self.ended = {}
         self.created = time.time()
         self.started = False
-        self.title = title if title else self.uuid
 
     def dict(self):
         return {
-            'title': self.title,
             'uuid': self.uuid,
             'n_players': self.game.num_players,
             'in_progress': self.game.state != 'pregame',
@@ -100,25 +78,25 @@ class GameManager(object):
         for p in self.changed:
             self.changed[p] = True
 
-    def join_game(self, player_name):
+    def join_game(self):
         if self.game.num_players >= 4:
             return {'error': 'Already at max players'}
         if self.game.state != 'pregame':
             return {'error': 'Game already in progress'}
 
-        pid, uuid = self.game.add_player(player_name)
+        pid, uuid = self.game.add_player("Player {}".format(self.game.num_players + 1))
         self.changed[pid] = False
         self.ended[pid] = False
         self.has_changed()
 
-        return {'title': self.title, 'id': pid, 'uuid': uuid}
+        return {'id': pid, 'uuid': uuid}
 
-    def spectate_game(self, player_name):
-        pid, uuid = self.game.add_spectator(player_name)
+    def spectate_game(self):
+        pid, uuid = self.game.add_spectator()
         self.changed[pid] = False
         self.has_changed()
 
-        return {'title': self.title, 'id': pid, 'uuid': uuid}
+        return {'id': pid, 'uuid': uuid}
 
     def start_game(self):
         if self.game.start_game():
@@ -149,36 +127,29 @@ def validate_player(game):
         return None, None
     return pid, game_manager
 
-@app.route('/create', methods=['POST'])
+@app.route('/create/<game>', methods=['POST'])
 @json_response
-def create_game():
-    payload = {}
-    if request.data:
-        payload = request.get_json(force=True)
-    new_game = GameManager(payload.get('title'))
+def create_game(game):
+    if game in game_map:
+        return {'result': {'error': 'Game already exists, try another name'}}
+    new_game = GameManager(game)
     return {'game': new_game.uuid, 'start': new_game.starter, 'state': new_game.game.dict()}
 
 @app.route('/join/<game>', methods=['POST'])
 @json_response
 def join_game(game):
     global game_map
-    payload = {}
-    if request.data:
-        payload = request.get_json(force=True)
     if game not in game_map:
         return {'error': 'No such game'}
-    return game_map[game].join_game(payload.get('name'))
+    return game_map[game].join_game()
 
 @app.route('/spectate/<game>', methods=['POST'])
 @json_response
 def spectate_game(game):
     global game_map
-    payload = {}
-    if request.data:
-        payload = request.get_json(force=True)
     if game not in game_map:
-        return {'error': 'No such game'}
-    return game_map[game].spectate_game(payload.get('name'))
+        return {'error': 'No such game', 'status': 404}
+    return game_map[game].spectate_game()
 
 @app.route('/start/<game>/<starter>', methods=['POST'])
 @json_response
@@ -189,6 +160,19 @@ def start_game(game, starter):
     if game_map[game].starter != starter:
         return {'error': 'Incorrect starter key'}
     return game_map[game].start_game()
+
+@app.route('/suggest', methods=['GET'])
+@json_response
+def suggest_game():
+    global game_map, words
+    n = len(words)
+    idx = random.choice(xrange(n))
+    start = idx
+    while words[idx] in game_map:
+        idx = (idx + 1) % n
+        if idx == start:
+            return {'error': 'No available games'}
+    return {'result': {'game': words[idx]}}
 
 @app.route('/game/<game>/next', methods=['POST'])
 @json_response
@@ -259,25 +243,34 @@ def list_games():
         del game_map[game]
     return {'games': [x.dict() for x in game_map.values()]}
 
+@app.route('/rename/<game>/<name>', methods=['POST'])
+@json_response
+def rename_player(game, name):
+    pid, game_manager = validate_player(game)
+    if game_manager is None:
+        return {'error': 'Invalid game / pid / uuid'}
+    game_manager.game.rename_player(pid, name)
+    game_manager.has_changed()
+    return {'result': {'status': 'ok'}}
+
 @app.route('/stat/<game>', methods=['GET'])
 @json_response
 def stat_game(game):
     pid, game_manager = validate_player(game)
     if game_manager is None:
-        return {'error': 'Invalid game / pid / uuid'}
+        return {'error': 'Invalid game / pid / uuid', 'status': 404}
     return {'state': game_manager.game.dict(pid), 'chat': game_manager.chats}
 
 @app.route('/poll/<game>', methods=['GET'])
 def poll_game(game):
     pid, game = validate_player(game)
     if game is None:
-        return Response(json.dumps({'error': 'Invalid game / pid / uuid'}),
+        return Response(json.dumps({'error': 'Invalid game / pid / uuid', 'status': 404}),
                         content_type='application/json',
                         status=404)
     return Response(game.poll(pid), content_type='application/json')
 
 @app.route('/')
-@requires_auth
 def index():
     return static_proxy('index.html')
 
@@ -289,6 +282,13 @@ def favicon():
 def static_proxy(filename):
     return send_from_directory(client_dir, filename)
 
+@app.route('/<game>')
+def existing_game(game):
+    return static_proxy('index.html')
+
 if __name__ == '__main__':
+    with open('server/words.txt') as f:
+        words = f.read().split('\n')[:-1]
+        random.shuffle(words)
     app.debug = True
-    app.run(host='0.0.0.0', port=8000, threaded=True)
+    app.run(host='127.0.0.1', port=8000, threaded=True)
