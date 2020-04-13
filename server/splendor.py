@@ -1,16 +1,19 @@
 from flask import Flask, Response, request, send_from_directory
 from functools import wraps
 from player_and_game import *
+import signal
 import random
 import time
 import json
 import os
+import sys
 
 app = Flask(__name__)
 game_map = {}
-POLL_INTERVAL = 0.1
+POLL_INTERVAL = 0.4
 client_dir = os.path.join(os.getcwd(), 'client')
 words = []
+num_created = 0
 
 def json_response(f):
     @wraps(f)
@@ -38,6 +41,18 @@ class GameManager(object):
             'uuid': self.uuid,
             'n_players': self.game.num_players,
             'in_progress': self.game.state != 'pregame',
+        }
+
+    def private_dict(self):
+       return {
+            'uuid': self.uuid,
+            'starter': self.starter,
+            'game': self.game.private_dict(),
+            'changed': self.changed,
+            'chats': self.chats,
+            'ended': self.ended,
+            'created': self.created,
+            'started': self.started
         }
 
     def poll(self, pid):
@@ -106,6 +121,18 @@ class GameManager(object):
         else:
             return {'error': 'Could not start game'}
 
+def game_manager_from_dict(obj):
+    self = GameManager(obj['uuid'])
+    self.starter = obj['starter']
+    self.game = game_from_dict(obj['game'])
+    for k, v in obj['changed'].iteritems():
+        self.changed[int(k)] = v
+    self.chats = obj['chats']
+    self.ended = obj['ended']
+    self.created = obj['created']
+    self.started = obj['started']
+    return self
+
 def validate_player(game):
     global game_map
 
@@ -130,9 +157,12 @@ def validate_player(game):
 @app.route('/create/<game>', methods=['POST'])
 @json_response
 def create_game(game):
+    global num_created
+
     if game in game_map:
         return {'result': {'error': 'Game already exists, try another name'}}
     new_game = GameManager(game)
+    num_created += 1
     return {'game': new_game.uuid, 'start': new_game.starter, 'state': new_game.game.dict()}
 
 @app.route('/join/<game>', methods=['POST'])
@@ -286,9 +316,35 @@ def static_proxy(filename):
 def existing_game(game):
     return static_proxy('index.html')
 
+@app.route('/stats')
+@json_response
+def get_stats():
+    games = game_map.keys()
+    num_games = len(games)
+    return {'games': games, 'num_games': num_games, 'num_created': num_created}
+
+def save_and_exit(number, frame):
+    global game_map
+
+    games = {}
+    for k, v in game_map.iteritems():
+        games[k] = v.private_dict()
+    with open('server/save.json', 'w') as f:
+        f.write(json.dumps(games))
+    sys.exit()
+
 if __name__ == '__main__':
     with open('server/words.txt') as f:
         words = f.read().split('\n')[:-1]
         random.shuffle(words)
-    app.debug = True
+
+    try:
+        with open('server/save.json') as f:
+            save = json.loads(f.read())
+            for k, v in save.iteritems():
+                game_map[k] = game_manager_from_dict(v)
+    except IOError:
+        pass
+
+    signal.signal(signal.SIGHUP, save_and_exit)
     app.run(host='127.0.0.1', port=8000, threaded=True)

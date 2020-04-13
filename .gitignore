@@ -2,3 +2,4 @@ node_modules
 activate
 ENV
 *.pyc
+save.json

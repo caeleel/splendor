@@ -207,6 +207,17 @@ class Player(object):
         if len(nobles) == 1:
             self.noble_visit(nobles[0].uuid)
 
+def player_from_dict(obj, game):
+    self = Player(game, obj['id'], obj['name'])
+    self.game = game
+    self.uuid = obj['uuid']
+    self.reserved = [card_from_dict(x) for x in obj['reserved']]
+    self.gems = obj['gems']
+    for k, v in obj['cards'].iteritems():
+        self.cards[k] = [card_from_dict(x) for x in v]
+    self.nobles = [noble_from_dict(x) for x in v]
+    return self
+
 class DummyPlayer(object):
     def dict(self):
         return {'reserved': []}
@@ -268,6 +279,13 @@ class Card(object):
             'level': self.level,
         }
 
+def card_from_dict(obj):
+    self = Card(obj['color'], obj['points'], 0, 0, 0, 0, 0)
+    self.level = obj['level']
+    self.uuid = obj['uuid']
+    self.cost = obj['cost']
+    return self
+
 def find_uuid(uuid, cards):
     for card in cards:
         if card.uuid == uuid:
@@ -310,6 +328,12 @@ class Noble(object):
             'uuid': self.uuid,
             'requirement': self.requirement,
         }
+
+def noble_from_dict(obj):
+    self = Noble(obj['id'], obj['points'], 0, 0, 0, 0, 0)
+    self.requirement = obj['requirement']
+    self.uuid = obj['uuid']
+    return self
 
 class Game(object):
     def __init__(self):
@@ -449,6 +473,59 @@ class Game(object):
 
         self.updated_at = time.time()
 
+    def dict(self, player_id=None):
+        if player_id is None:
+            player_id = self.active_player_index
+        if player_id not in self.pids:
+            return {}
+
+        result = {
+            'players': [],
+            'cards': {},
+            'log': self.logs,
+            'gems': self.gems,
+            'nobles': array_dict(self.nobles),
+            'decks': {},
+            'winner': self.winner,
+            'turn': self.active_player_index,
+        }
+        for level in LEVELS:
+            result['cards'][level] = array_dict(self.cards[level])
+            result['decks'][level] = len(self.decks[level])
+
+        players = result['players']
+        for player in self.players[:self.num_players]:
+            toDict = player.dict()
+            if player.id != player_id:
+                for reserved in toDict['reserved']:
+                    restricted = [k for k in reserved if k not in ('level', 'uuid')]
+                    for k in restricted:
+                        del reserved[k]
+            players.append(toDict)
+        return result
+
+    def private_dict(self):
+        cards = {}
+        decks = {}
+        for k, v in self.cards.iteritems():
+            cards[k] = array_dict(v)
+        for k, v in self.decks.iteritems():
+            decks[k] = array_dict(v)
+
+        return {
+            'players': [p.dict() if p else None for p in self.players],
+            'num_players': self.num_players,
+            'cards': cards,
+            'pids': self.pids,
+            'logs': self.logs,
+            'gems': self.gems,
+            'nobles': array_dict(self.nobles),
+            'decks': decks,
+            'winner': self.winner,
+            'state': self.state,
+            'turn': self.active_player_index,
+        }
+
     def log(self, msg):
         self.logs.append({
             'pid': self.active_player_index,
@@ -561,33 +638,20 @@ class Game(object):
             self.next_turn()
         return result
 
-    def dict(self, player_id=None):
-        if player_id is None:
-            player_id = self.active_player_index
-        if player_id not in self.pids:
-            return {}
+def game_from_dict(obj):
+    self = Game()
+    self.logs = obj['logs']
+    self.gems = obj['gems']
+    self.winner = obj['winner']
+    self.pids = obj['pids']
+    self.state = obj['state']
+    self.active_player_index = obj['turn']
+    self.num_players = obj['num_players']
+    self.players = [player_from_dict(p, self) if p else None for p in obj['players']]
+    for k, v in obj['cards'].iteritems():
+        self.cards[k] = [card_from_dict(c) for c in v]
+    for k, v in obj['decks'].iteritems():
+        self.decks[k] = [card_from_dict(c) for c in v]
+    self.nobles = [noble_from_dict(n) for n in obj['nobles']]
+    return self
 
-        result = {
-            'players': [],
-            'cards': {},
-            'log': self.logs,
-            'gems': self.gems,
-            'nobles': array_dict(self.nobles),
-            'decks': {},
-            'winner': self.winner,
-            'turn': self.active_player_index,
-        }
-        for level in LEVELS:
-            result['cards'][level] = array_dict(self.cards[level])
-            result['decks'][level] = len(self.decks[level])
-
-        players = result['players']
-        for player in self.players[:self.num_players]:
-            toDict = player.dict()
-            if player.id != player_id:
-                for reserved in toDict['reserved']:
-                    restricted = [k for k in reserved if k not in ('level', 'uuid')]
-                    for k in restricted:
-                        del reserved[k]
-            players.append(toDict)
-        return result
