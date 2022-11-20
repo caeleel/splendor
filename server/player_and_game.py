@@ -2,7 +2,7 @@ import random
 import uuid
 import time
 
-MAX_PLAYERS = 4
+MAX_PLAYERS = 2
 COLORS = ('b', 'u', 'w', 'g', 'r')
 LEVELS = ('level1', 'level2', 'level3')
 COLOR_DICT = {
@@ -40,7 +40,7 @@ class Player(object):
 
     def dict(self):
         cards = {}
-        for k, v in self.cards.iteritems():
+        for k, v in self.cards.items():
             cards[k] = array_dict(v)
         return {
             'id': self.id,
@@ -297,7 +297,7 @@ def array_dict(cards):
 
 def shuffle_deck(deck):
     n = len(deck)
-    for i in xrange(n):
+    for i in range(n):
         j = random.randint(i, n-1)
         x = deck[j]
         deck[j] = deck[i]
@@ -579,7 +579,7 @@ class Game(object):
 
     def next_turn(self):
         if self.active_player().score() >= 15:
-            self.last_round();
+            self.last_round()
         self.active_player_index = (self.active_player_index + 1) % self.num_players
         if self.is_last_round and self.active_player_index == 0:
             self.state = 'postgame'

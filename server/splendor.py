@@ -196,7 +196,7 @@ def start_game(game, starter):
 def suggest_game():
     global game_map, words
     n = len(words)
-    idx = random.choice(xrange(n))
+    idx = random.choice(range(n))
     start = idx
     while words[idx] in game_map:
         idx = (idx + 1) % n
@@ -346,5 +346,5 @@ if __name__ == '__main__':
     except IOError:
         pass
 
-    signal.signal(signal.SIGHUP, save_and_exit)
+    #signal.signal(signal.SIGHUP, save_and_exit)
     app.run(host='127.0.0.1', port=8000, threaded=True)
