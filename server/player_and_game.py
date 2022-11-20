@@ -160,11 +160,11 @@ class Player(object):
             return {'error': "That's not a valid color"}
         if not self.game.gems[color]:
             return {'error': "No gems remaining"}
-        if len(self.taken) > 2:
+        if len(self.taken) > 2: #작동 X
             return {'error': "Cannot take more than 3 gems"}
-        if len(self.taken) > 1 and color in self.taken:
+        if len(self.taken) > 1 and color in self.taken: #작동 X
             return {'error': "Cannot take the same color on the 3rd gem"}
-        if len(self.taken) == 1 and color in self.taken and self.game.gems[color] < 3:
+        if len(self.taken) == 1 and color in self.taken and self.game.gems[color] < 3: #작동
             return {'error': "Cannot take 2 gems from the same pile of less than 4"}
         if self.total_gems() > 9:
             return {'error': "Already have 10 gems"}
@@ -473,6 +473,9 @@ class Game(object):
 
         self.updated_at = time.time()
 
+    def reset(self):
+        self.__init__()
+        
     def dict(self, player_id=None):
         if player_id is None:
             player_id = self.active_player_index
@@ -544,6 +547,9 @@ class Game(object):
         self.players[player.id] = player
         self.num_players += 1
         self.nobles.append(self.noble_pool[self.num_players])
+        if self.num_players == 1:
+            for c in COLORS:
+                self.gems[c] = 4
         if self.num_players == 2:
             for c in COLORS:
                 self.gems[c] = 4
@@ -566,7 +572,7 @@ class Game(object):
         return (player.id, player.uuid)
 
     def start_game(self):
-        if self.num_players < 2:
+        if self.num_players < 1:
             return False
         self.state = 'game'
         self.next_turn()
