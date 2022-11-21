@@ -116,6 +116,7 @@ class GameManager(object):
     def start_game(self):
         if self.game.start_game():
             self.has_changed()
+            
             self.started = True
             return {}
         else:
