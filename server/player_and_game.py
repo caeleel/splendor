@@ -38,6 +38,23 @@ class Player(object):
         }
         self.start_turn()
 
+    def reset(self):
+        self.cards = {
+            'b': [],
+            'u': [],
+            'w': [],
+            'g': [],
+            'r': [],
+        }
+        self.gems = {
+            'b': 0,
+            'u': 0,
+            'w': 0,
+            'g': 0,
+            'r': 0,
+            '*': 0,
+        }
+
     def dict(self):
         cards = {}
         for k, v in self.cards.items():
@@ -165,6 +182,7 @@ class Player(object):
         if len(self.taken) > 1 and color in self.taken: #작동 X
             return {'error': "Cannot take the same color on the 3rd gem"}
         if len(self.taken) == 1 and color in self.taken and self.game.gems[color] < 3: #작동
+            self.game.reset()
             return {'error': "Cannot take 2 gems from the same pile of less than 4"}
         if self.total_gems() > 9:
             return {'error': "Already have 10 gems"}
@@ -213,7 +231,7 @@ def player_from_dict(obj, game):
     self.uuid = obj['uuid']
     self.reserved = [card_from_dict(x) for x in obj['reserved']]
     self.gems = obj['gems']
-    for k, v in obj['cards'].iteritems():
+    for k, v in obj['cards'].items():
         self.cards[k] = [card_from_dict(x) for x in v]
     self.nobles = [noble_from_dict(x) for x in v]
     return self
@@ -267,7 +285,7 @@ class Card(object):
 
     def __str__(self):
         result = "{0} card worth {1}, costing ".format(COLOR_DICT[self.color], self.points)
-        costs = ["{0} {1}".format(v, COLOR_DICT[k]) for k, v in self.cost.iteritems() if v > 0]
+        costs = ["{0} {1}".format(v, COLOR_DICT[k]) for k, v in self.cost.items() if v > 0]
         return result + ', '.join(costs)
 
     def dict(self):
@@ -318,7 +336,7 @@ class Noble(object):
 
     def __str__(self):
         result = "noble worth {0}, seeking ".format(self.points)
-        costs = ["{0} {1}".format(v, COLOR_DICT[k]) for k, v in self.requirement.iteritems() if v > 0]
+        costs = ["{0} {1}".format(v, COLOR_DICT[k]) for k, v in self.requirement.items() if v > 0]
         return result + ', '.join(costs)
 
     def dict(self):
@@ -470,11 +488,150 @@ class Game(object):
             shuffle_deck(self.decks[level])
             for card in self.decks[level]:
                 card.level = level
+        
+        for c in COLORS:
+            self.gems[c] = 4
 
         self.updated_at = time.time()
 
+
     def reset(self):
-        self.__init__()
+        level_1 = [
+            Card('b', 0, 1, 1, 1, 1, 0),
+            Card('b', 0, 1, 2, 1, 1, 0),
+            Card('b', 0, 2, 2, 0, 1, 0),
+            Card('b', 0, 0, 0, 1, 3, 1),
+            Card('b', 0, 0, 0, 2, 1, 0),
+            Card('b', 0, 2, 0, 2, 0, 0),
+            Card('b', 0, 0, 0, 3, 0, 0),
+            Card('b', 1, 0, 4, 0, 0, 0),
+            Card('u', 0, 1, 0, 1, 1, 1),
+            Card('u', 0, 1, 0, 1, 2, 1),
+            Card('u', 0, 1, 0, 2, 2, 0),
+            Card('u', 0, 0, 1, 3, 1, 0),
+            Card('u', 0, 1, 0, 0, 0, 2),
+            Card('u', 0, 0, 0, 2, 0, 2),
+            Card('u', 0, 0, 0, 0, 0, 3),
+            Card('u', 1, 0, 0, 0, 4, 0),
+            Card('w', 0, 0, 1, 1, 1, 1),
+            Card('w', 0, 0, 1, 2, 1, 1),
+            Card('w', 0, 0, 2, 2, 0, 1),
+            Card('w', 0, 3, 1, 0, 0, 1),
+            Card('w', 0, 0, 0, 0, 2, 1),
+            Card('w', 0, 0, 2, 0, 0, 2),
+            Card('w', 0, 0, 3, 0, 0, 0),
+            Card('w', 1, 0, 0, 4, 0, 0),
+            Card('g', 0, 1, 1, 0, 1, 1),
+            Card('g', 0, 1, 1, 0, 1, 2),
+            Card('g', 0, 0, 1, 0, 2, 2),
+            Card('g', 0, 1, 3, 1, 0, 0),
+            Card('g', 0, 2, 1, 0, 0, 0),
+            Card('g', 0, 0, 2, 0, 2, 0),
+            Card('g', 0, 0, 0, 0, 3, 0),
+            Card('g', 1, 0, 0, 0, 0, 4),
+            Card('r', 0, 1, 1, 1, 0, 1),
+            Card('r', 0, 2, 1, 1, 0, 1),
+            Card('r', 0, 2, 0, 1, 0, 2),
+            Card('r', 0, 1, 0, 0, 1, 3),
+            Card('r', 0, 0, 2, 1, 0, 0),
+            Card('r', 0, 2, 0, 0, 2, 0),
+            Card('r', 0, 3, 0, 0, 0, 0),
+            Card('r', 1, 4, 0, 0, 0, 0),
+        ]
+        level_2 = [
+            Card('b', 1, 3, 2, 2, 0, 0),
+            Card('b', 1, 3, 0, 3, 0, 2),
+            Card('b', 2, 0, 1, 4, 2, 0),
+            Card('b', 2, 0, 0, 5, 3, 0),
+            Card('b', 2, 5, 0, 0, 0, 0),
+            Card('b', 3, 0, 0, 0, 0, 6),
+            Card('u', 1, 0, 2, 2, 3, 0),
+            Card('u', 1, 0, 2, 3, 0, 3),
+            Card('u', 2, 5, 3, 0, 0, 0),
+            Card('u', 2, 2, 0, 0, 1, 4),
+            Card('u', 2, 0, 5, 0, 0, 0),
+            Card('u', 3, 0, 6, 0, 0, 0),
+            Card('w', 1, 0, 0, 3, 2, 2),
+            Card('w', 1, 2, 3, 0, 3, 0),
+            Card('w', 2, 0, 0, 1, 4, 2),
+            Card('w', 2, 0, 0, 0, 5, 3),
+            Card('w', 2, 0, 0, 0, 5, 0),
+            Card('w', 3, 6, 0, 0, 0, 0),
+            Card('g', 1, 3, 0, 2, 3, 0),
+            Card('g', 1, 2, 3, 0, 0, 2),
+            Card('g', 2, 4, 2, 0, 0, 1),
+            Card('g', 2, 0, 5, 3, 0, 0),
+            Card('g', 2, 0, 0, 5, 0, 0),
+            Card('g', 3, 0, 0, 6, 0, 0),
+            Card('r', 1, 2, 0, 0, 2, 3),
+            Card('r', 1, 0, 3, 0, 2, 3),
+            Card('r', 2, 1, 4, 2, 0, 0),
+            Card('r', 2, 3, 0, 0, 0, 5),
+            Card('r', 2, 0, 0, 0, 0, 5),
+            Card('r', 3, 0, 0, 0, 6, 0),
+        ]
+        level_3 = [
+            Card('b', 3, 3, 3, 5, 3, 0),
+            Card('b', 4, 0, 0, 0, 7, 0),
+            Card('b', 4, 0, 0, 3, 6, 3),
+            Card('b', 5, 0, 0, 0, 7, 3),
+            Card('u', 3, 3, 0, 3, 3, 5),
+            Card('u', 4, 7, 0, 0, 0, 0),
+            Card('u', 4, 6, 3, 0, 0, 3),
+            Card('u', 5, 7, 3, 0, 0, 0),
+            Card('w', 3, 0, 3, 3, 5, 3),
+            Card('w', 4, 0, 0, 0, 0, 7),
+            Card('w', 4, 3, 0, 0, 3, 6),
+            Card('w', 5, 3, 0, 0, 0, 7),
+            Card('g', 3, 5, 3, 0, 3, 3),
+            Card('g', 4, 0, 7, 0, 0, 0),
+            Card('g', 4, 3, 6, 3, 0, 0),
+            Card('g', 5, 0, 7, 3, 0, 0),
+            Card('r', 3, 3, 5, 3, 0, 3),
+            Card('r', 4, 0, 0, 7, 0, 0),
+            Card('r', 4, 0, 3, 6, 3, 0),
+            Card('r', 5, 0, 0, 7, 3, 0),
+        ]
+        self.noble_pool = [
+            Noble(0, 3, 0, 0, 0, 4, 4),
+            Noble(1, 3, 0, 0, 3, 3, 3),
+            Noble(2, 3, 0, 4, 4, 0, 0),
+            Noble(3, 3, 4, 4, 0, 0, 0),
+            Noble(4, 3, 3, 3, 0, 0, 3),
+            Noble(5, 3, 0, 0, 4, 4, 0),
+            Noble(6, 3, 0, 3, 3, 3, 0),
+            Noble(7, 3, 4, 0, 0, 0, 4),
+            Noble(8, 3, 3, 3, 3, 0, 0),
+            Noble(9, 3, 3, 0, 0, 3, 3),
+        ]
+        shuffle_deck(self.noble_pool)
+        self.nobles = self.noble_pool[:1]
+        self.logs = []
+        self.winner = None
+        self.is_last_round = False
+        self.gems = {'*': 5}
+        self.cards = {}
+        self.decks = {
+            'level1': level_1,
+            'level2': level_2,
+            'level3': level_3,
+        }
+
+        for c in COLORS:
+            self.gems[c] = 4
+
+        for level in LEVELS:
+            self.cards[level] = []
+            shuffle_deck(self.decks[level])
+            for card in self.decks[level]:
+                card.level = level
+        
+        for player in self.players[:self.num_players]:
+            player.reset()
+
+        self.updated_at = time.time()
+
+        return self.players[0], self.players[1]
         
     def dict(self, player_id=None):
         if player_id is None:
@@ -505,14 +662,15 @@ class Game(object):
                     for k in restricted:
                         del reserved[k]
             players.append(toDict)
+
         return result
 
     def private_dict(self):
         cards = {}
         decks = {}
-        for k, v in self.cards.iteritems():
+        for k, v in self.cards.items():
             cards[k] = array_dict(v)
-        for k, v in self.decks.iteritems():
+        for k, v in self.decks.items():
             decks[k] = array_dict(v)
 
         return {
@@ -547,19 +705,17 @@ class Game(object):
         self.players[player.id] = player
         self.num_players += 1
         self.nobles.append(self.noble_pool[self.num_players])
-        if self.num_players == 1:
-            for c in COLORS:
-                self.gems[c] = 4
-        if self.num_players == 2:
-            for c in COLORS:
-                self.gems[c] = 4
-        if self.num_players == 3:
-            for c in COLORS:
-                self.gems[c] = 5
-        if self.num_players == 4:
-            for c in COLORS:
-                self.gems[c] = 7
+
         return (player.id, player.uuid)
+    
+
+    def add_player_for_reset(self, name):
+        player = Player(self, self.num_players, name)
+        self.pids.append(player.id)
+        self.players[player.id] = player
+        self.num_players += 1
+        self.nobles.append(self.noble_pool[self.num_players])
+        return player
 
     def rename_player(self, pid, name):
         self.players[pid].name = name
@@ -654,9 +810,9 @@ def game_from_dict(obj):
     self.active_player_index = obj['turn']
     self.num_players = obj['num_players']
     self.players = [player_from_dict(p, self) if p else None for p in obj['players']]
-    for k, v in obj['cards'].iteritems():
+    for k, v in obj['cards'].items():
         self.cards[k] = [card_from_dict(c) for c in v]
-    for k, v in obj['decks'].iteritems():
+    for k, v in obj['decks'].items():
         self.decks[k] = [card_from_dict(c) for c in v]
     self.nobles = [noble_from_dict(n) for n in obj['nobles']]
     return self
