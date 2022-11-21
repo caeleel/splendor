@@ -55,6 +55,33 @@ class Player(object):
             '*': 0,
         }
 
+    def step(self, action): #a는 [가져올 보석 개수, 구매할 카드 행/렬]
+        reward=0
+        done = False
+        print("step test")
+        for i, a in enumerate(action):
+            if a>0 and i<5 : 
+                self.take(COLORS[i])
+                if i == 4:
+                    break
+            #카드 구매
+            elif(i==5 and a>0) and a<4 :
+                print("try to buy card")
+                level = LEVELS[a-1]
+                card_to_buy = self.game.deck[level][action[6]]
+                uuid = find_uuid(card_to_buy.uuid, self.game.cards[level]) #구매 카드 uuid 찾기
+                self.buy(uuid)
+
+                reward += 0.5*(15-self.score)
+                reward += card_to_buy.points
+
+                break
+
+        if(self.score()>=15) :
+            done = True
+
+        return (self.id, self.name, self.game, self.nobles, self.uuid, self.reserved, self.cards, self.gems), reward, done
+
     def dict(self):
         cards = {}
         for k, v in self.cards.items():
@@ -108,6 +135,7 @@ class Player(object):
             if self.power(c) < card.cost[c]:
                 owed += card.cost[c] - self.power(c)
                 if owed > self.gems['*']:
+                    print("Not enough gems")
                     return {'error': 'Not enough gems'}
 
         if card in self.reserved:
@@ -182,7 +210,6 @@ class Player(object):
         if len(self.taken) > 1 and color in self.taken: #작동 X
             return {'error': "Cannot take the same color on the 3rd gem"}
         if len(self.taken) == 1 and color in self.taken and self.game.gems[color] < 3: #작동
-            self.game.reset()
             return {'error': "Cannot take 2 gems from the same pile of less than 4"}
         if self.total_gems() > 9:
             return {'error': "Already have 10 gems"}
@@ -224,6 +251,10 @@ class Player(object):
         nobles = self.check_nobles()
         if len(nobles) == 1:
             self.noble_visit(nobles[0].uuid)
+        
+        #step test
+        self.step([0,0,0,0,0,0,1,0])
+
 
 def player_from_dict(obj, game):
     self = Player(game, obj['id'], obj['name'])
@@ -491,6 +522,9 @@ class Game(object):
         
         for c in COLORS:
             self.gems[c] = 4
+        
+        #player 2명 만들기
+        #self.add_player("Player {}".format(self.num_players + 1))
 
         self.updated_at = time.time()
 
