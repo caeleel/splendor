@@ -55,37 +55,6 @@ class Player(object):
             'r': 0,
             '*': 0,
         }
-   
-    #a는s [가져올 보석 개수, 구매할 카드 행/렬]
-    #카드 열 번호는 왼쪽부터 0, 1, ...
-    def step(self, action): 
-        reward=0
-        done = False
-        for i, a in enumerate(action):
-            if a>0 and i<5 : 
-                self.take(COLORS[i])
-                if i == 4:
-                    break
-            #카드 구매
-            elif(i==5 and a>0) and a<4 :
-                print("try to buy card")
-                level = LEVELS[a-1]
-                card_to_buy = self.game.cards[level][action[6]]
-                print(card_to_buy)
-                uuid = find_uuid(card_to_buy.uuid, self.game.cards[level]) #구매 카드 uuid 찾기
-                 
-                #정상적 구매를 한 경우
-                if not self.buy(uuid):
-                    reward += 0.5*(15-self.score())
-                    reward += card_to_buy.points
-                    print(f'reward: {reward}')
-
-                break
-
-        if(self.score()>=15) :
-            done = True
-
-        return (self.id, self.name, self.game, self.nobles, self.uuid, self.reserved, self.cards, self.gems), reward, done
 
     def dict(self):
         cards = {}
@@ -667,7 +636,37 @@ class Game(object):
 
         self.refill()
 
-        return self.players
+        return
+
+    #a는s [가져올 보석 개수, 구매할 카드 행/렬]
+    #카드 열 번호는 왼쪽부터 0, 1, ...
+    def step(self, action): 
+        reward=0
+        done = False
+        player = self.active_player()
+
+        #보석 구매
+        for i, a in enumerate(action):
+            if a>0 and i<5 : 
+                self.take(COLORS[i])
+                if i == 4:
+                    break
+
+            #카드 구매
+            elif(i==5 and a>0) and a<4 :
+                print("try to buy card")
+                level = LEVELS[a-1]
+                card_to_buy = self.cards[level][action[6]]
+                print(f'card_to_buy: {card_to_buy}')
+                 
+                #정상적 구매를 한 경우
+                if not self.buy(card_to_buy.uuid):
+                    reward += 0.5*(15-player.score())
+                    reward += card_to_buy.points
+                    print(f'reward: {reward}')
+
+                break
+        return
         
     def dict(self, player_id=None):
         if player_id is None:

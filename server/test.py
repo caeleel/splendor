@@ -10,10 +10,18 @@ GM.start_game()
 game = GM.game
 
 #reset 메소드 테스트
-players = game.reset()
+game.reset()
+
+for card in game.cards['level1']:
+    print(card)
 
 #step 메소드 테스트
-players[0].step([0,0,1,1,1,0,0])
-players[1].step([1,1,1,0,0,0,0])
+game.step([1,1,1,0,0,0,0])
+game.step([0,0,1,1,1,0,0])
+game.step([1,1,1,0,0,0,0])
+game.step([0,0,1,1,1,0,0])
+
+game.step([0,0,0,0,0,1,3])
+
 
 app.run(host='127.0.0.1', port=8000, threaded=True, debug=True)
