@@ -467,7 +467,7 @@ class Game(object):
             Noble(9, 3, 3, 0, 0, 3, 3),
         ]
         shuffle_deck(self.noble_pool)
-        self.nobles = self.noble_pool[:1]
+        self.nobles = self.noble_pool[:3]
 
         self.num_players = 0
         self.state = 'pregame'
@@ -608,7 +608,7 @@ class Game(object):
             Noble(9, 3, 3, 0, 0, 3, 3),
         ]
         shuffle_deck(self.noble_pool)
-        self.nobles = self.noble_pool[:1]
+        self.nobles = self.noble_pool[:3]
         self.logs = []
         self.winner = None
         self.is_last_round = False
@@ -641,6 +641,7 @@ class Game(object):
     #a는s [가져올 보석 개수, 구매할 카드 행/렬]
     #카드 열 번호는 왼쪽부터 0, 1, ...
     def step(self, action): 
+        
         reward=0
         done = False
         player = self.active_player()
@@ -661,12 +662,50 @@ class Game(object):
                  
                 #정상적 구매를 한 경우
                 if not self.buy(card_to_buy.uuid):
-                    reward += 0.5*(15-player.score())
+                    reward += 0.5*((15-player.score())/15)
                     reward += card_to_buy.points
                     print(f'reward: {reward}')
 
                 break
-        return
+        
+        #리턴할 환경 정보
+        env_nobles = [list(noble.requirement.values()) for noble in self.nobles]
+
+        env_cards = []
+        c_dict = {'b': 0, 'u': 1, 'w': 2, 'g':3, 'r':4}
+        for level in LEVELS:
+            cards = []
+            for c in self.cards[level]:
+                card = list(c.cost.values())
+                card.append(c_dict[c.color])
+                card.append(c.points)
+                cards.append(card)
+
+            env_cards.append(cards)
+        
+        #내 정보
+        my_cards = [len(player.cards[color]) for color in COLORS]
+        my_gems = [player.gems[color] for color in COLORS]
+
+        #상대 정보
+        opponent = self.active_player()
+        opp_cards = [len(opponent.cards[color]) for color in COLORS]
+        opp_gems = [opponent.gems[color] for color in COLORS]
+
+        env_player_state = [my_cards, my_gems, opp_cards, opp_gems]
+
+        env_score = [player.score(), opponent.score()]
+
+        state = {"nobles": env_nobles, 
+                 "cards": env_cards, 
+                 "player_state": env_player_state, 
+                 "score": env_score
+                 }
+
+        if (player.score() >= 15) or (opponent.score() >= 15):
+            done = True
+
+        return state, reward, done, False, {}
         
     def dict(self, player_id=None):
         if player_id is None:
