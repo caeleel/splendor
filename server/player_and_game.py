@@ -2,6 +2,7 @@ import random
 import uuid
 import time
 
+
 MAX_PLAYERS = 2
 COLORS = ('b', 'u', 'w', 'g', 'r')
 LEVELS = ('level1', 'level2', 'level3')
@@ -54,11 +55,12 @@ class Player(object):
             'r': 0,
             '*': 0,
         }
-
-    def step(self, action): #a는 [가져올 보석 개수, 구매할 카드 행/렬]
+   
+    #a는s [가져올 보석 개수, 구매할 카드 행/렬]
+    #카드 열 번호는 왼쪽부터 0, 1, ...
+    def step(self, action): 
         reward=0
         done = False
-        print("step test")
         for i, a in enumerate(action):
             if a>0 and i<5 : 
                 self.take(COLORS[i])
@@ -68,12 +70,15 @@ class Player(object):
             elif(i==5 and a>0) and a<4 :
                 print("try to buy card")
                 level = LEVELS[a-1]
-                card_to_buy = self.game.deck[level][action[6]]
+                card_to_buy = self.game.cards[level][action[6]]
+                print(card_to_buy)
                 uuid = find_uuid(card_to_buy.uuid, self.game.cards[level]) #구매 카드 uuid 찾기
-                self.buy(uuid)
-
-                reward += 0.5*(15-self.score)
-                reward += card_to_buy.points
+                 
+                #정상적 구매를 한 경우
+                if not self.buy(uuid):
+                    reward += 0.5*(15-self.score())
+                    reward += card_to_buy.points
+                    print(f'reward: {reward}')
 
                 break
 
@@ -175,6 +180,7 @@ class Player(object):
         return {}
 
     def reserve(self, uuid):
+
         if len(self.reserved) > 2:
             return {'error': "Already have 3 cards in reserve"}
         if self.game.gems['*'] > 0:
@@ -251,9 +257,6 @@ class Player(object):
         nobles = self.check_nobles()
         if len(nobles) == 1:
             self.noble_visit(nobles[0].uuid)
-        
-        #step test
-        self.step([0,0,0,0,0,0,1,0])
 
 
 def player_from_dict(obj, game):
@@ -522,9 +525,6 @@ class Game(object):
         
         for c in COLORS:
             self.gems[c] = 4
-        
-        #player 2명 만들기
-        #self.add_player("Player {}".format(self.num_players + 1))
 
         self.updated_at = time.time()
 
@@ -665,7 +665,9 @@ class Game(object):
 
         self.updated_at = time.time()
 
-        return self.players[0], self.players[1]
+        self.refill()
+
+        return self.players
         
     def dict(self, player_id=None):
         if player_id is None:
@@ -762,6 +764,7 @@ class Game(object):
         return (player.id, player.uuid)
 
     def start_game(self):
+        print("game is starting")
         if self.num_players < 1:
             return False
         self.state = 'game'
@@ -830,6 +833,7 @@ class Game(object):
 
     def reserve(self, uuid):
         result = self.active_player().reserve(uuid)
+        
         if 'error' not in result:
             self.next_turn()
         return result
