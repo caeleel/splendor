@@ -1,7 +1,7 @@
 import random
 import uuid
 import time
-
+import numpy as np
 
 MAX_PLAYERS = 2
 COLORS = ('b', 'u', 'w', 'g', 'r')
@@ -67,6 +67,7 @@ class Player(object):
             'reserved': array_dict(self.reserved),
             'nobles': array_dict(self.nobles),
             'cards': cards,
+
             'gems': self.gems,
             'score': self.score(),
         }
@@ -706,7 +707,42 @@ class Game(object):
             done = True
 
         return state, reward, done, False, {}
+    
+
+    #action 제약
+    #보석이 0인 경우는 가져올 수 없음
+    #카드에 해당하는 보석이 없는 경우는 구매 불가
+    def filter(self):
+        # 인덱스 값이 0인 경우 보석을 가져올 수 없음
+        #filgem = [1,1,1,1,1]
+        filgem  = {}
+        for c in COLORS:
+            if(self.gems[c] == 0):
+                filgem[c]=0
+            else:
+                filgem[c]=1
+        #a가 1이면 선택 가능 -> ex){'b': 1, 'u': 1, 'w': 1, 'g': 1, 'r': 1}
+
+
+        #구매 가능한 카드 목록 3x4행렬
+        #값이 1인 경우 구매 가능
+        filcard = np.ones((3,4))
+        player = self.active_player()#현재 플레이어
+        for i,level in enumerate(LEVELS):
+            for j,card in enumerate(self.cards[level]): 
+                for c in COLORS:
+                    if player.power(c) < card.cost[c]:  #해당 보석의 개수를 충족하지 못하는 경우
+                        filcard[i][j]=0
+                        break
         
+        filresult = { 
+            'gems' : filgem, #가져올 수 있는 보석 
+            'cards' : filcard, #구매 가능한 카드 행렬 3x4
+        }
+
+        return filresult
+
+
     def dict(self, player_id=None):
         if player_id is None:
             player_id = self.active_player_index
