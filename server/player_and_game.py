@@ -637,7 +637,41 @@ class Game(object):
 
         self.refill()
 
-        return
+        #리턴할 환경 정보
+        env_nobles = [list(noble.requirement.values()) for noble in self.nobles]
+
+        env_cards = []
+        c_dict = {'b': 0, 'u': 1, 'w': 2, 'g':3, 'r':4}
+        for level in LEVELS:
+            cards = []
+            for c in self.cards[level]:
+                card = list(c.cost.values())
+                card.append(c_dict[c.color])
+                card.append(c.points)
+                cards.append(card)
+
+            env_cards.append(cards)
+        
+        #내 정보
+        my_cards = [len(player.cards[color]) for color in COLORS]
+        my_gems = [player.gems[color] for color in COLORS]
+
+        #상대 정보
+        opponent = self.active_player()
+        opp_cards = [len(opponent.cards[color]) for color in COLORS]
+        opp_gems = [opponent.gems[color] for color in COLORS]
+
+        env_player_state = [my_cards, my_gems, opp_cards, opp_gems]
+
+        env_score = [player.score(), opponent.score()]
+
+        state = {"nobles": env_nobles, 
+                 "cards": env_cards, 
+                 "player_state": env_player_state, 
+                 "score": env_score
+                 }
+
+        return state
 
     #a는s [가져올 보석 개수, 구매할 카드 행/렬]
     #카드 열 번호는 왼쪽부터 0, 1, ...
@@ -715,12 +749,10 @@ class Game(object):
     def filter(self):
         # 인덱스 값이 0인 경우 보석을 가져올 수 없음
         #filgem = [1,1,1,1,1]
-        filgem  = []
+        filgem  = [1,1,1,1,1]
         for i,c in enumerate(COLORS):
             if(self.gems[c] == 0):
                 filgem[i]=0
-            else:
-                filgem[i]=1
         #a가 1이면 선택 가능 -> ex){'b': 1, 'u': 1, 'w': 1, 'g': 1, 'r': 1}
 
 

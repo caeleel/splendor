@@ -146,14 +146,15 @@ def main():
 
         done = False
         while not done:
-            done2 = False
-            while not done2:
-                #a = agent.select_action(torch.from_numpy(s).float(), epsilon)
+            while True:
+                a = agent.select_action(torch.from_numpy(s).float(), epsilon)
                 dic = env.filter()
-                a=1
+
                 b = agent.action[a]
-                if dic['cards'][b[5]-1][b[6]]==0:
+                if b[5]>0 and dic['cards'][b[5]-1][b[6]]==0:
                     continue
+                if b[5]>0 and dic['cards'][b[5]-1][b[6]]==1:
+                    break
                 flag = True
                 for i in range(4):
                     if dic['gems'][i]<b[i]:
@@ -163,13 +164,13 @@ def main():
                     break
             print(a)
             s_prime, r, done, info = env.step(agent.action[a])
+            print(s_prime['player_state'][0], s_prime['player_state'][1])
             s_prime = state2np(s_prime)
             done_mask = 0.0 if done else 1.0
             agent.memory.put((s,a,r/100.0,s_prime, done_mask))
             s = s_prime
 
             score += r
-            
             if agent.memory.size()>2000:
                 agent.train(agent.model, agent.target_model, agent.memory, agent.optimizer)
 
