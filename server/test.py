@@ -1,6 +1,6 @@
 from flask import Flask
-from  splendor import *
-from  splendor import GameManager
+from  server.splendor_env import *
+from  server.splendor_env import GameManager
 
 #Player 2명이 참가하는 게임 생성
 GM = GameManager("Aircraft")

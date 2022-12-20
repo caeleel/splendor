@@ -706,7 +706,7 @@ class Game(object):
         if (player.score() >= 15) or (opponent.score() >= 15):
             done = True
 
-        return state, reward, done, False, {}
+        return state, reward, done, False
     
 
     #action 제약
@@ -715,12 +715,12 @@ class Game(object):
     def filter(self):
         # 인덱스 값이 0인 경우 보석을 가져올 수 없음
         #filgem = [1,1,1,1,1]
-        filgem  = {}
-        for c in COLORS:
+        filgem  = []
+        for i,c in enumerate(COLORS):
             if(self.gems[c] == 0):
-                filgem[c]=0
+                filgem[i]=0
             else:
-                filgem[c]=1
+                filgem[i]=1
         #a가 1이면 선택 가능 -> ex){'b': 1, 'u': 1, 'w': 1, 'g': 1, 'r': 1}
 
 

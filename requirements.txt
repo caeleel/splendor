@@ -1,3 +1,5 @@
 flask
 requests
-
+torch
+torchvision
+gym
