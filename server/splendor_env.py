@@ -116,6 +116,7 @@ class GameManager(object):
     def start_game(self):
         if self.game.start_game():
             self.has_changed()
+            
             self.started = True
             return {}
         else:
@@ -196,7 +197,7 @@ def start_game(game, starter):
 def suggest_game():
     global game_map, words
     n = len(words)
-    idx = random.choice(xrange(n))
+    idx = random.choice(range(n))
     start = idx
     while words[idx] in game_map:
         idx = (idx + 1) % n
@@ -333,18 +334,19 @@ def save_and_exit(number, frame):
         f.write(json.dumps(games))
     sys.exit()
 
+with open('server/words.txt') as f:
+    words = f.read().split('\n')[:-1]
+    random.shuffle(words)
+
+try:
+    with open('server/save.json') as f:
+        save = json.loads(f.read())
+        for k, v in save.iteritems():
+            game_map[k] = game_manager_from_dict(v)
+except IOError:
+    pass
+
+#signal.signal(signal.SIGHUP, save_and_exit)
+
 if __name__ == '__main__':
-    with open('server/words.txt') as f:
-        words = f.read().split('\n')[:-1]
-        random.shuffle(words)
-
-    try:
-        with open('server/save.json') as f:
-            save = json.loads(f.read())
-            for k, v in save.iteritems():
-                game_map[k] = game_manager_from_dict(v)
-    except IOError:
-        pass
-
-    signal.signal(signal.SIGHUP, save_and_exit)
-    app.run(host='127.0.0.1', port=8000, threaded=True)
+    app.run(host='127.0.0.1', port=8000, threaded=True, debug=True)

@@ -8,7 +8,7 @@ gid = None
 uuid = None
 pid = None
 start_key = None
-server = 'http://localhost:5000'
+server = 'http://localhost:8000'
 curr_state = None
 card_hash = {}
 reverse_hash = {}
@@ -19,7 +19,7 @@ def create():
     gid = resp.json()['game']
     start_key = resp.json()['start']
     handle_resp(resp, False)
-    print 'created game {0} with start_key {1}'.format(gid, start_key)
+    print('created game {0} with start_key {1}'.format(gid, start_key))
 
 def join(game=None):
     global gid, uuid, pid, start_key
@@ -31,20 +31,20 @@ def join(game=None):
     j = resp.json()
     uuid = j['uuid']
     pid = j['id']
-    print 'joined as player {0}'.format(pid)
+    print('joined as player {0}'.format(pid))
     if not start_key:
         poll()
 
 def start():
     resp = requests.post(server + '/start/{0}/{1}'.format(gid, start_key))
     if not resp.json():
-        print 'started'
+        print('started')
         poll()
     else:
-        print resp.json()
+        print(resp.json())
 
 def print_card(card):
-    print '{0}> ({1})--[{2}] | b:{3} u:{4} w:{5} g:{6} r:{7}'.format(
+    print('{0}> ({1})--[{2}] | b:{3} u:{4} w:{5} g:{6} r:{7}'.format(
         reverse_hash[card['uuid']],
         card['color'],
         card['points'],
@@ -53,41 +53,41 @@ def print_card(card):
         card['cost']['w'],
         card['cost']['g'],
         card['cost']['r']
-    )
+    ))
 
 def print_nobles(nobles):
-    print '  << Nobles >>'
+    print ('  << Nobles >>')
     for noble in nobles:
-        print '   [{0}] b:{1} u:{2} w:{3} g:{4} r:{5}'.format(
+        print ('   [{0}] b:{1} u:{2} w:{3} g:{4} r:{5}'.format(
             noble['points'],
             noble['requirement']['b'],
             noble['requirement']['u'],
             noble['requirement']['w'],
             noble['requirement']['g'],
             noble['requirement']['r'],
-        )
+        ))
 
 def print_gems(target):
-    print 'Gems <> b:{0} u:{1} w:{2} g:{3} r:{4} *:{5}'.format(
+    print ('Gems <> b:{0} u:{1} w:{2} g:{3} r:{4} *:{5}'.format(
         target['gems'].get('b', '-'),
         target['gems'].get('u', '-'),
         target['gems'].get('w', '-'),
         target['gems'].get('g', '-'),
         target['gems'].get('r', '-'),
         target['gems'].get('*', '-'),
-    )
+    ))
 
 def print_player(player):
-    print 'Player {0} :: [{1}]'.format(player['id'], player['score'])
-    print '================'
+    print ('Player {0} :: [{1}]'.format(player['id'], player['score']))
+    print ('================')
     print_gems(player)
-    print 'Cards <> b:{0} u:{1} w:{2} g:{3} r:{4}'.format(
+    print ('Cards <> b:{0} u:{1} w:{2} g:{3} r:{4}'.format(
         len(player['cards']['b']),
         len(player['cards']['u']),
         len(player['cards']['w']),
         len(player['cards']['g']),
         len(player['cards']['r']),
-    )
+    ))
     print_nobles(player['nobles'])
 
 def print_state():
@@ -99,21 +99,21 @@ def print_state():
     reverse_hash = {}
     count = 1
 
-    print 'Gems'
-    print '----'
+    print ('Gems')
+    print ('----')
     print_gems(curr_state)
-    print ''
+    print ('')
     print_nobles(curr_state['nobles'])
-    print ''
+    print ('')
     for k, v in curr_state['cards'].iteritems():
-        print '{0} -> {1} remaining'.format(k, curr_state['decks'][k])
-        print '-----------------------'
+        print ('{0} -> {1} remaining'.format(k, curr_state['decks'][k]))
+        print ('-----------------------')
         for card in v:
             card_hash[count] = card['uuid']
             reverse_hash[card['uuid']] = count
             count += 1
             print_card(card)
-        print ''
+        print ('')
     for player in curr_state['players']:
         print_player(player)
 
@@ -131,10 +131,10 @@ def handle_resp(resp, do_poll=True):
 
     if 'result' in resp.json():
         if resp.json()['result'].get('error'):
-            print resp.json()['result']['error']
+            print(resp.json()['result']['error'])
             return
         else:
-            print resp.json()['result']
+            print(resp.json()['result'])
 
     curr_state = resp.json()['state']
     print_state()
@@ -151,14 +151,14 @@ def next():
 
 def list_games():
     resp = requests.get(server + '/list')
-    print 'Games:'
-    print '------'
+    print ('Games:')
+    print ('------')
     for game in resp.json()['games']:
         active = 'waiting'
         if game['in_progress']:
             active = 'in progress'
-        print '{0} -> {1} player(s) | {2}'.format(game['uuid'], game['players'], active)
-    print ''
+        print ('{0} -> {1} player(s) | {2}'.format(game['uuid'], game['players'], active))
+    print ('')
 
 class Client(cmd.Cmd):
     prompt = '> '
@@ -203,7 +203,7 @@ class Client(cmd.Cmd):
         print_state()
 
     def do_EOF(self, line):
-        print ''
+        print ('')
         return True
 
     def do_list(self, line):
